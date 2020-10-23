@@ -1,1 +1,0 @@
-# mineflayer-auto-eat
