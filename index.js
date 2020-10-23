@@ -1,9 +1,20 @@
 module.exports = function (bot, options) {
-	bot.autoEat = {
-		priority: options.priority || 'foodPoints',
-		startAt: options.startAt || 14,
-		bannedFood: options.bannedFood || []
-	};
+	var disabled = false;
+
+	bot.autoEat = {}
+
+	bot.autoEat.disable = function disable() {
+		disabled = true;
+	}
+
+	bot.autoEat.enable = function enable() {
+		disabled = false;
+	}
+
+	bot.autoEat.options = {}
+	bot.autoEat.options.priority = options.priority || 'foodPoints',
+	bot.autoEat.options.startAt = options.startAt || 14
+	bot.autoEat.options.bannedFood = options.bannedFood || []
 
 	var isEating = false;
 
@@ -73,12 +84,13 @@ module.exports = function (bot, options) {
 			if (
 				bot.food < bot.autoEat.startAt &&
 				!(bot.pathfinder.isMining() || bot.pathfinder.isBuilding()) &&
-				isEating === false
+				isEating === false &&
+				disabled === false
 			) {
 				eat();
 			}
 		} else {
-			if (bot.food < bot.autoEat.startAt) {
+			if (bot.food < bot.autoEat.startAt && isEating === false && disabled === false) {
 				eat();
 			}
 		}
