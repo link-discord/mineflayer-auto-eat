@@ -1,0 +1,22 @@
+{
+  "name": "mineflayer-auto-eat",
+  "version": "1.0.0",
+  "description": "A auto eat plugin for mineflayer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mineflayer",
+    "plugin",
+    "minecraft",
+    "autoeat",
+    "auto",
+    "eat"
+  ],
+  "author": "Link#0069",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.20"
+  }
+}
