@@ -1,20 +1,20 @@
 module.exports = function (bot, options) {
 	var disabled = false;
 
-	bot.autoEat = {}
+	bot.autoEat = {};
 
 	bot.autoEat.disable = function disable() {
 		disabled = true;
-	}
+	};
 
 	bot.autoEat.enable = function enable() {
 		disabled = false;
-	}
+	};
 
-	bot.autoEat.options = {}
-	bot.autoEat.options.priority = options.priority || 'foodPoints',
-	bot.autoEat.options.startAt = options.startAt || 14
-	bot.autoEat.options.bannedFood = options.bannedFood || []
+	bot.autoEat.options = {};
+	bot.autoEat.options.priority = options.priority || 'foodPoints';
+	bot.autoEat.options.startAt = options.startAt || 14;
+	bot.autoEat.options.bannedFood = options.bannedFood || [];
 
 	var isEating = false;
 
@@ -40,15 +40,13 @@ module.exports = function (bot, options) {
 			if (names.includes(element.name)) available_food.push(element);
 		});
 
-		if (bot.autoEat.bannedFood.length >= 0) {
-			lodash.filter(available_food, function (item) {
-				return !bot.autoEat.bannedFood.includes(item.name);
-			});
+		if (bot.autoEat.options.bannedFood.length >= 0) {
+			available_food = available_food.filter((item) => !bot.autoEat.options.bannedFood.includes(item.name));
 		}
 
 		var best_food;
 
-		if (bot.autoEat.priority === 'foodPoints')
+		if (bot.autoEat.options.priority === 'foodPoints')
 			best_food = available_food.find((item) => item.foodPoints === lodash.maxBy(available_food, 'foodPoints'));
 		else best_food = available_food.find((item) => item.saturation === lodash.maxBy(available_food, 'saturation'));
 
@@ -73,16 +71,17 @@ module.exports = function (bot, options) {
 					} else {
 						isEating = false;
 						bot.emit('autoeat_stopped');
+						if (!bot.food === 20) eat();
 					}
 				});
 			}
 		});
 	}
 
-	bot.on('physicTick', () => {
+	bot.on('health', () => {
 		if (bot.pathfinder) {
 			if (
-				bot.food < bot.autoEat.startAt &&
+				bot.food < bot.autoEat.options.startAt &&
 				!(bot.pathfinder.isMining() || bot.pathfinder.isBuilding()) &&
 				isEating === false &&
 				disabled === false
@@ -90,7 +89,7 @@ module.exports = function (bot, options) {
 				eat();
 			}
 		} else {
-			if (bot.food < bot.autoEat.startAt && isEating === false && disabled === false) {
+			if (bot.food < bot.autoEat.options.startAt && isEating === false && disabled === false) {
 				eat();
 			}
 		}
