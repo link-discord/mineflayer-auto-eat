@@ -96,6 +96,6 @@ module.exports = function (bot, options) {
 	});
 
 	bot.on('spawn', () => {
-		isEating = false;
+		isEating = false; // to prevent the plugin from breaking if the bot gets killed while eating btw
 	});
 };
