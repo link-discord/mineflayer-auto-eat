@@ -1,101 +1,122 @@
 module.exports = function (bot, options) {
-	var disabled = false;
+    var disabled = false
 
-	bot.autoEat = {};
+    bot.autoEat = {}
 
-	bot.autoEat.disable = function disable() {
-		disabled = true;
-	};
+    bot.autoEat.disable = function disable() {
+        disabled = true
+    }
 
-	bot.autoEat.enable = function enable() {
-		disabled = false;
-	};
+    bot.autoEat.enable = function enable() {
+        disabled = false
+    }
 
-	bot.autoEat.options = {};
-	bot.autoEat.options.priority = options.priority || 'foodPoints';
-	bot.autoEat.options.startAt = options.startAt || 14;
-	bot.autoEat.options.bannedFood = options.bannedFood || [];
+    bot.autoEat.eat = eat;
 
-	var isEating = false;
+    bot.autoEat.options = {}
+    bot.autoEat.options.priority = options.priority || 'foodPoints'
+    bot.autoEat.options.startAt = options.startAt || 14
+    bot.autoEat.options.bannedFood = options.bannedFood || []
 
-	const lodash = require('lodash');
-	const mcData = require('minecraft-data')(bot.version);
+    var isEating = false
 
-	function eat() {
-		isEating = true;
+    const lodash = require('lodash')
+    const mcData = require('minecraft-data')(bot.version)
 
-		var data = mcData.foodsArray;
-		var names = data.map((item) => item.name);
+    function eat(callback) {
+        isEating = true
 
-		var found_food = bot.inventory.items().filter((item) => names.includes(item.name));
+        var data = mcData.foodsArray
+        var names = data.map((item) => item.name)
 
-		if (found_food.length === 0 || !found_food) {
-			isEating = false;
-			return;
-		}
+        var found_food = bot.inventory
+            .items()
+            .filter((item) => names.includes(item.name))
 
-		var available_food = [];
+        if (found_food.length === 0 || !found_food) {
+            isEating = false
+            return callback(new Error('No food found.'))
+        }
 
-		bot.inventory.items().forEach((element) => {
-			if (names.includes(element.name)) available_food.push(element);
-		});
+        var available_food = []
 
-		if (bot.autoEat.options.bannedFood.length >= 0) {
-			available_food = available_food.filter((item) => !bot.autoEat.options.bannedFood.includes(item.name));
-		}
+        bot.inventory.items().forEach((element) => {
+            if (names.includes(element.name)) available_food.push(element)
+        })
 
-		var best_food;
+        if (bot.autoEat.options.bannedFood.length >= 0) {
+            available_food = available_food.filter(
+                (item) => !bot.autoEat.options.bannedFood.includes(item.name)
+            )
+        }
 
-		if (bot.autoEat.options.priority === 'foodPoints')
-			best_food = available_food.find((item) => item.foodPoints === lodash.maxBy(available_food, 'foodPoints'));
-		else best_food = available_food.find((item) => item.saturation === lodash.maxBy(available_food, 'saturation'));
+        var best_food
 
-		if (!best_food) {
-			isEating = false;
-			return;
-		}
+        if (bot.autoEat.options.priority === 'foodPoints')
+            best_food = available_food.find(
+                (item) =>
+                    item.foodPoints ===
+                    lodash.maxBy(available_food, 'foodPoints')
+            )
+        else
+            best_food = available_food.find(
+                (item) =>
+                    item.saturation ===
+                    lodash.maxBy(available_food, 'saturation')
+            )
 
-		bot.emit('autoeat_started');
+        if (!best_food) {
+            isEating = false
+            return callback(new Error('No best food has been found.'))
+        }
 
-		bot.equip(best_food, 'hand', function (error) {
-			if (error) {
-				console.error(error);
-				bot.emit('autoeat_stopped');
-				isEating = false;
-			} else {
-				bot.consume(function (err) {
-					if (err) {
-						console.error(err);
-						bot.emit('autoeat_stopped');
-						isEating = false;
-					} else {
-						isEating = false;
-						bot.emit('autoeat_stopped');
-						if (!bot.food === 20) eat();
-					}
-				});
-			}
-		});
-	}
+        bot.emit('autoeat_started')
 
-	bot.on('health', () => {
-		if (bot.pathfinder) {
-			if (
-				bot.food < bot.autoEat.options.startAt &&
-				!(bot.pathfinder.isMining() || bot.pathfinder.isBuilding()) &&
-				isEating === false &&
-				disabled === false
-			) {
-				eat();
-			}
-		} else {
-			if (bot.food < bot.autoEat.options.startAt && isEating === false && disabled === false) {
-				eat();
-			}
-		}
-	});
+        bot.equip(best_food, 'hand', function (error) {
+            if (error) {
+                console.error(error)
+                bot.emit('autoeat_stopped')
+                isEating = false
+            } else {
+                bot.consume(function (err) {
+                    if (err) {
+                        console.error(err)
+                        bot.emit('autoeat_stopped')
+                        isEating = false
+                        return callback(err)
+                    } else {
+                        isEating = false
+                        bot.emit('autoeat_stopped')
+                        callback(null)
+                        if (!bot.food === 20) eat()
+                    }
+                })
+            }
+        })
+    }
 
-	bot.on('spawn', () => {
-		isEating = false; // to prevent the plugin from breaking if the bot gets killed while eating btw
-	});
-};
+    bot.on('health', () => {
+        if (bot.pathfinder) {
+            if (
+                bot.food < bot.autoEat.options.startAt &&
+                !(bot.pathfinder.isMining() || bot.pathfinder.isBuilding()) &&
+                isEating === false &&
+                disabled === false
+            ) {
+                eat()
+            }
+        } else {
+            if (
+                bot.food < bot.autoEat.options.startAt &&
+                isEating === false &&
+                disabled === false
+            ) {
+                eat()
+            }
+        }
+    })
+
+    bot.on('spawn', () => {
+        isEating = false // to prevent the plugin from breaking if the bot gets killed while eating btw
+    })
+}

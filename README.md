@@ -14,6 +14,7 @@
     - [Methods](#methods)
       - [bot.autoEat.enable()](#botautoeatenable)
       - [bot.autoEat.disable()](#botautoeatdisable)
+      - [bot.autoEat.eat()](#botautoeateat)
   - [Author](#author)
   - [Show your support](#show-your-support)
 
@@ -124,6 +125,19 @@ Calling this function will enable the plugin
 
 #### bot.autoEat.disable()
 Calling this function will disable the plugin
+
+### bot.autoEat.eat()
+If you want to for some ever reason want to call the eat function manually 
+you can do it like this below
+```js
+bot.autoEat.eat(function (err) {
+    if (err) {
+      console.error(err)
+    } else {
+      console.log('Success!')
+    }
+})
+```
 
 ## Author
 
