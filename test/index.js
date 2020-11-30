@@ -39,12 +39,12 @@ bot.once('spawn', () => {
     setTimeout(() => {
         bot.autoEat.eat(function (err) {
             if (err) {
-                console.log('Error appeared! exiting')
+                console.log('Error occured! exiting with status code 1')
                 console.error(err)
                 process.exit(1)
             } else {
                 setTimeout(() => {
-                    console.log('Success! exiting')
+                    console.log('Success! exiting with status code 0')
                     process.exit(0)
                 }, 1000);
             }
