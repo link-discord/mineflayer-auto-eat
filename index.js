@@ -23,6 +23,10 @@ module.exports = function (bot, options) {
     const lodash = require('lodash')
     const mcData = require('minecraft-data')(bot.version)
 
+    function callbackHandle(err) {
+	if (err) console.error(err)
+    }
+
     function eat(callback) {
         isEating = true
 
@@ -81,14 +85,14 @@ module.exports = function (bot, options) {
                 bot.consume(function (err) {
                     if (err) {
                         console.error(err)
-                        bot.emit('autoeat_stopped')
+                        bot.emit('autoeat_stopped') 
                         isEating = false
                         return callback(err)
                     } else {
                         isEating = false
                         bot.emit('autoeat_stopped')
                         callback(null)
-                        if (!bot.food === 20) eat()
+                        if (!bot.food === 20) eat(callbackHandle)
                     }
                 })
             }
@@ -103,7 +107,7 @@ module.exports = function (bot, options) {
                 isEating === false &&
                 disabled === false
             ) {
-                eat()
+                eat(callbackHandle)
             }
         } else {
             if (
@@ -111,7 +115,7 @@ module.exports = function (bot, options) {
                 isEating === false &&
                 disabled === false
             ) {
-                eat()
+                eat(callbackHandle)
             }
         }
     })
