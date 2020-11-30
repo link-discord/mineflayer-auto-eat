@@ -11,7 +11,7 @@ bot.loadPlugin(autoeat)
 
 bot.once('spawn', () => {
     bot.autoEat.options = {
-        priority: 'saturation',
+        priority: 'foodPoints',
         startAt: -1,
         bannedFood: [],
     }
