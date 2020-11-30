@@ -16,10 +16,12 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 14
-      - name: Install Dependencies
+      - name: Install Dependencies for the test file
         run: npm ci
         working-directory: ./test
-      - name: Testing
+      - name: Install Main dependencies for the package
+        run: npm ci
+      - name: Start Testing
         run: node ./test/index.js
         env:
           CI: true
