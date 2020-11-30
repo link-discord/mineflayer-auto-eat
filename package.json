@@ -1,6 +1,6 @@
 {
   "name": "mineflayer-auto-eat",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "An auto eat plugin for mineflayer",
   "main": "index.js",
   "scripts": {
