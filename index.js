@@ -39,7 +39,7 @@ module.exports = function (bot, options) {
 
         if (found_food.length === 0 || !found_food) {
             isEating = false
-            return callback(new Error('No food found.'))
+            return callback(null)
         }
 
         var available_food = []
@@ -71,7 +71,7 @@ module.exports = function (bot, options) {
 
         if (!best_food) {
             isEating = false
-            return callback(new Error('No best food has been found.'))
+            return callback(null)
         }
 
         bot.emit('autoeat_started')
