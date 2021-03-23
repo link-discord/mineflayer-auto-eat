@@ -27,7 +27,7 @@ module.exports = function (bot, options) {
 	if (err) console.error(err)
     }
 
-    function eat(callback) {
+    function eat(callback, manual = false) {
         isEating = true
 
         var data = mcData.foodsArray
@@ -39,7 +39,8 @@ module.exports = function (bot, options) {
 
         if (found_food.length === 0 || !found_food) {
             isEating = false
-            return callback(null)
+            if (!manual) return callback(null)
+	    else return callback(new Error('No Food found.'))
         }
 
         var available_food = []
@@ -71,7 +72,8 @@ module.exports = function (bot, options) {
 
         if (!best_food) {
             isEating = false
-            return callback(null)
+            if (!manual) return callback(null)
+	    else return callback(new Error('No Food found.'))
         }
 
         bot.emit('autoeat_started')
