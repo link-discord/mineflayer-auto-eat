@@ -59,6 +59,7 @@ bot.once("spawn", () => {
     bannedFood: [],
   }
 })
+
 // The bot eats food automatically and emits these events when it starts eating and stops eating.
 
 bot.on("autoeat_started", () => {
