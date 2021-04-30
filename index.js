@@ -81,7 +81,7 @@ module.exports = function (bot, options) {
 						isEating = false
 						bot.emit('autoeat_stopped')
 						callback(null)
-						if (!bot.food === 20) eat(callbackHandle)
+						if (bot.food !== 20) eat(callbackHandle)
 					}
 				})
 			}
