@@ -20,42 +20,33 @@ module.exports = function (bot, options) {
 
 	var isEating = false
 
-	const lodash = require('lodash')
 	const mcData = require('minecraft-data')(bot.version)
+
+	const foodData = mcData.foodsArray
+	const foodNames = foodData.map((item) => item.name)
 
 	function callbackHandle(err) {
 		if (err) console.error(err)
 	}
 
 	function eat(callback, manual = false) {
+		if (isEating) return callback(Error("Already eating"))
+		
 		isEating = true
 
-		var data = mcData.foodsArray
-		var names = data.map((item) => item.name)
+		var best_food = null
+		var best_points = -1
 
-		var found_food = bot.inventory.items().filter((item) => names.includes(item.name))
-
-		if (found_food.length === 0 || !found_food) {
-			isEating = false
-			if (!manual) return callback(null)
-			else return callback(new Error('No Food found.'))
+		var priorityProperty = bot.autoEat.options.priority === 'foodPoints' ? 'foodPoints' : 'saturation'
+		
+		for (const item of bot.inventory.items()) {
+			if (best_points < item[priorityProperty]) {
+				if (foodNames.includes(item.name) && !bot.autoEat.options.bannedFood.includes(item.name)) {
+					best_food = item
+					best_points = item[priorityProperty];
+				}
+			}
 		}
-
-		var available_food = []
-
-		bot.inventory.items().forEach((element) => {
-			if (names.includes(element.name)) available_food.push(element)
-		})
-
-		if (bot.autoEat.options.bannedFood.length >= 0) {
-			available_food = available_food.filter((item) => !bot.autoEat.options.bannedFood.includes(item.name))
-		}
-
-		var best_food
-
-		if (bot.autoEat.options.priority === 'foodPoints')
-			best_food = available_food.find((item) => item.foodPoints === lodash.maxBy(available_food, 'foodPoints'))
-		else best_food = available_food.find((item) => item.saturation === lodash.maxBy(available_food, 'saturation'))
 
 		if (!best_food) {
 			isEating = false
@@ -70,6 +61,7 @@ module.exports = function (bot, options) {
 				console.error(error)
 				bot.emit('autoeat_stopped')
 				isEating = false
+				return callback(error)
 			} else {
 				bot.consume(function (err) {
 					if (err) {
@@ -92,20 +84,23 @@ module.exports = function (bot, options) {
 		if (bot.pathfinder) {
 			if (
 				bot.food < bot.autoEat.options.startAt &&
-				!(bot.pathfinder.isMining() || bot.pathfinder.isBuilding()) &&
-				isEating === false &&
+				!(bot.pathfinder.isMining() || bot.pathfinder.isBuilding())
 				disabled === false
 			) {
 				eat(callbackHandle)
 			}
 		} else {
-			if (bot.food < bot.autoEat.options.startAt && isEating === false && disabled === false) {
+			if (bot.food < bot.autoEat.options.startAt && disabled === false) {
 				eat(callbackHandle)
 			}
 		}
 	})
 
 	bot.on('spawn', () => {
+		isEating = false // to prevent the plugin from breaking if the bot gets killed while eating btw
+	})
+
+	bot.on('death', () => {
 		isEating = false // to prevent the plugin from breaking if the bot gets killed while eating btw
 	})
 }
