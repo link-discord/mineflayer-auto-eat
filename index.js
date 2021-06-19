@@ -31,14 +31,14 @@ module.exports = function (bot, options) {
 
 	function eat(callback, manual = false) {
 		if (isEating) return callback(Error("Already eating"))
-		
+
 		isEating = true
 
 		var best_food = null
 		var best_points = -1
 
 		var priorityProperty = bot.autoEat.options.priority === 'foodPoints' ? 'foodPoints' : 'saturation'
-		
+
 		for (const item of bot.inventory.items()) {
 			if (best_points < item[priorityProperty]) {
 				if (foodNames.includes(item.name) && !bot.autoEat.options.bannedFood.includes(item.name)) {
@@ -84,7 +84,7 @@ module.exports = function (bot, options) {
 		if (bot.pathfinder) {
 			if (
 				bot.food < bot.autoEat.options.startAt &&
-				!(bot.pathfinder.isMining() || bot.pathfinder.isBuilding())
+				!(bot.pathfinder.isMining() || bot.pathfinder.isBuilding()) &&
 				disabled === false
 			) {
 				eat(callbackHandle)
