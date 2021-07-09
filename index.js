@@ -28,47 +28,35 @@ module.exports = function (bot, options) {
 
 		bot.autoEat.isEating = true
 
-		var best_food = null
-		var best_points = -1
-		const priorityProperty = bot.autoEat.options.priority
+		const priority = bot.autoEat.options.priority
+		const banned = bot.autoEat.options.bannedFood
+		const food = bot.autoEat.foodsByName
 
-		for (const item of bot.inventory.items()) {
-			if (!(item.name in bot.autoEat.foodsByName))
-				continue // Skip non-food items
-			if (bot.autoEat.options.bannedFood.includes(item.name))
-				continue // Skip banned food
-			const props = bot.autoEat.foodsByName[item.name]
-			if (best_points < props[priorityProperty]) {
-				best_points = props[priorityProperty]
-				best_food = item
-			}
-		}
+		const bestChoices = bot.inventory.items()
+			.filter((it) => it.name in bot.autoEat.foodsByName)
+			.filter((it) => !banned.includes(it.name))
+			.sort((a, b) => food[b.name][priority] - food[a.name][priority])
 
-		if (!best_food) {
+		if (bestChoices.length === 0) {
 			bot.autoEat.isEating = false
 			if (!manual) return callback(null)
 			else return callback(new Error('No Food found.'))
 		}
 
-		bot.emit('autoeat_started', best_food)
+		const bestFood = bestChoices[0]
 
-		bot.equip(best_food, 'hand', (error) => {
-			if (error) {
+		bot.emit('autoeat_started', bestFood);
+
+		(async () => {
+			try {
+				await bot.equip(bestFood, 'hand')
+				await bot.consume()
+			} catch (error) {
 				bot.emit('autoeat_stopped', error)
 				bot.autoEat.isEating = false
 				return callback(error)
 			}
-			bot.consume((err) => {
-				bot.emit('autoeat_stopped', err)
-				bot.autoEat.isEating = false
-				if (err) {
-					return callback(err)
-				} else {
-					callback(null)
-					if (bot.food !== 20) eat()
-				}
-			})
-		})
+		})()
 	}
 
 	bot.on('health', () => {
