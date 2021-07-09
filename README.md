@@ -103,13 +103,12 @@ bot.once("spawn", () => {
 ```
 
 #### bot.autoEat.options.priority
-Acceptable Values are "saturation" or "foodPoints"
-When choosing "saturation" the bot will search for the food with the highest saturation instead of highest food points
+Acceptable Values are "saturation", "foodPoints" or "effectiveQuality"
 
 default: "foodPoints"
 
 #### bot.autoEat.options.startAt
-If the bot reaches that number of food points the bot will start to eat
+If the bot has less food points than that number, it will start eating
 
 default: 14
 
