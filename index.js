@@ -56,6 +56,9 @@ module.exports = function (bot, options) {
 				bot.autoEat.isEating = false
 				return callback(error)
 			}
+			bot.emit('autoeat_stopped')
+			bot.autoEat.isEating = false
+			callback(null)
 		})()
 	}
 
