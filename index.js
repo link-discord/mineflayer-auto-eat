@@ -15,6 +15,8 @@ module.exports = function (bot, options) {
 	bot.autoEat.options.priority = options.priority || 'foodPoints'
 	bot.autoEat.options.startAt = options.startAt || 14
 	bot.autoEat.options.bannedFood = options.bannedFood || []
+	// https://github.com/PrismarineJS/mineflayer/issues/2030
+	bot.autoEat.options.autofixIssue2030 = options.autofixIssue2030 || false
 
 	bot.autoEat.foodsByName = {}
 
@@ -49,7 +51,12 @@ module.exports = function (bot, options) {
 
 		(async () => {
 			try {
+				const requiresConfirmation = bot.inventory.requiresConfirmation
+				if (bot.autoEat.options.autofixIssue2030)
+					bot.inventory.requiresConfirmation = false
 				await bot.equip(bestFood, 'hand')
+				if (bot.autoEat.options.autofixIssue2030)
+					bot.inventory.requiresConfirmation = requiresConfirmation
 				await bot.consume()
 			} catch (error) {
 				bot.emit('autoeat_stopped', error)

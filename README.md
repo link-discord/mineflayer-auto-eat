@@ -117,6 +117,12 @@ The bot will not eat the items in the array unless they are the only items avail
 
 default: []
 
+#### bot.autoEat.options.autofixIssue2030
+Forces bot to disable inventory window click confirmation.
+Related to [PrismarineJS/mineflayer#2030](https://github.com/PrismarineJS/mineflayer/issues/2030)
+
+default: false
+
 ### Methods
 
 #### bot.autoEat.enable()
