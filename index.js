@@ -1,106 +1,121 @@
 module.exports = function (bot, options) {
-	var disabled = false
-
-	bot.autoEat = {}
+	bot.autoEat = { disabled: false, isEating: false }
 
 	bot.autoEat.disable = function disable() {
-		disabled = true
+		bot.autoEat.disabled = true
 	}
 
 	bot.autoEat.enable = function enable() {
-		disabled = false
+		bot.autoEat.disabled = false
 	}
 
 	bot.autoEat.eat = eat
 
-	bot.autoEat.options = {}
-	bot.autoEat.options.priority = options.priority || 'foodPoints'
-	bot.autoEat.options.startAt = options.startAt || 14
-	bot.autoEat.options.bannedFood = options.bannedFood || []
+	bot.autoEat.options = {
+		priority: options.priority || 'foodPoints',
+		startAt: options.startAt || 14,
+		bannedFood: options.bannedFood || [],
+		ignoreInventoryCheck: options.ignoreInventoryCheck || false,
+		checkOnItemPickup: options.checkOnItemPickup || false,
+		eatingTimeout: options.eatingTimeout || 3
+	}
 
-	var isEating = false
+	bot.autoEat.foodsByName = {}
 
-	const mcData = require('minecraft-data')(bot.version)
+	bot.once('spawn', () => {
+		bot.autoEat.foodsByName = require('minecraft-data')(bot.version).foodsByName
+	})
 
-	const foodData = mcData.foodsArray
-	const foodNames = foodData.map((item) => item.name)
-
-	function callbackHandle(err) {
-		if (err) console.error(err)
+	function timeoutAfter(time, message) {
+		return new Promise((_, reject) => {
+			setTimeout(() => {
+				reject(new Error(message))
+			}, time)
+		})
 	}
 
 	function eat(callback, manual = false) {
-		if (isEating) return callback(Error("Already eating"))
+		callback = callback || ((e) => { }) // fallback callback that does nothing
+		if (bot.autoEat.isEating) return callback(Error("Already eating"))
 
-		isEating = true
+		bot.autoEat.isEating = true
 
-		var best_food = null
-		var best_points = -1
+		const priority = bot.autoEat.options.priority
+		const banned = bot.autoEat.options.bannedFood
+		const food = bot.autoEat.foodsByName
 
-		var priorityProperty = bot.autoEat.options.priority === 'foodPoints' ? 'foodPoints' : 'saturation'
+		const bestChoices = bot.inventory.items()
+			.filter((it) => it.name in bot.autoEat.foodsByName)
+			.filter((it) => !banned.includes(it.name))
+			.sort((a, b) => food[b.name][priority] - food[a.name][priority])
 
-		for (const item of bot.inventory.items()) {
-			if (best_points < item[priorityProperty]) {
-				if (foodNames.includes(item.name) && !bot.autoEat.options.bannedFood.includes(item.name)) {
-					best_food = item
-					best_points = item[priorityProperty];
-				}
-			}
-		}
-
-		if (!best_food) {
-			isEating = false
+		if (bestChoices.length === 0) {
+			bot.autoEat.isEating = false
 			if (!manual) return callback(null)
 			else return callback(new Error('No Food found.'))
 		}
 
-		bot.emit('autoeat_started')
+		const bestFood = bestChoices[0]
 
-		bot.equip(best_food, 'hand', function (error) {
-			if (error) {
-				console.error(error)
-				bot.emit('autoeat_stopped')
-				isEating = false
+		bot.emit('autoeat_started', bestFood);
+
+		(async () => {
+			try {
+				const requiresConfirmation = bot.inventory.requiresConfirmation
+				if (bot.autoEat.options.ignoreInventoryCheck)
+					bot.inventory.requiresConfirmation = false
+				await bot.equip(bestFood, 'hand')
+				bot.inventory.requiresConfirmation = requiresConfirmation
+				if (bot.autoEat.options.eatingTimeout !== null
+					&& bot.autoEat.options.eatingTimeout > 0) {
+					const timeout = bot.autoEat.options.eatingTimeout * 1000;
+					await Promise.race([
+						bot.consume(),
+						timeoutAfter(timeout, 'Eating took too long')
+					])
+				} else {
+					await bot.consume()
+				}
+			} catch (error) {
+				bot.emit('autoeat_stopped', error)
+				bot.autoEat.isEating = false
 				return callback(error)
-			} else {
-				bot.consume(function (err) {
-					if (err) {
-						console.error(err)
-						bot.emit('autoeat_stopped')
-						isEating = false
-						return callback(err)
-					} else {
-						isEating = false
-						bot.emit('autoeat_stopped')
-						callback(null)
-						if (bot.food !== 20) eat(callbackHandle)
-					}
-				})
 			}
-		})
+			bot.emit('autoeat_stopped')
+			bot.autoEat.isEating = false
+			callback(null)
+			if (bot.food < bot.autoEat.options.startAt)
+				eat();
+		})()
 	}
 
 	bot.on('health', () => {
+		if (bot.autoEat.disabled) return
+		if (bot.food >= bot.autoEat.options.startAt) return
 		if (bot.pathfinder) {
-			if (
-				bot.food < bot.autoEat.options.startAt &&
-				!(bot.pathfinder.isMining() || bot.pathfinder.isBuilding()) &&
-				disabled === false
-			) {
-				eat(callbackHandle)
-			}
-		} else {
-			if (bot.food < bot.autoEat.options.startAt && disabled === false) {
-				eat(callbackHandle)
-			}
+			if (bot.pathfinder.isMining() || bot.pathfinder.isBuilding())
+				return
 		}
+		try {
+			bot.autoEat.eat()
+		} catch (e) { /* ignore */ }
 	})
 
+	bot.on('playerCollect', async (who) => {
+		if (who.username !== bot.username
+			|| !bot.autoEat.options.checkOnItemPickup) return;
+
+		try {
+			await bot.waitForTicks(1)
+			bot.autoEat.eat()
+		} catch (e) { /* ignore */ }
+	});
+
 	bot.on('spawn', () => {
-		isEating = false // to prevent the plugin from breaking if the bot gets killed while eating btw
+		bot.autoEat.isEating = false // Eating status is reset on spawn/death
 	})
 
 	bot.on('death', () => {
-		isEating = false // to prevent the plugin from breaking if the bot gets killed while eating btw
+		bot.autoEat.isEating = false
 	})
 }

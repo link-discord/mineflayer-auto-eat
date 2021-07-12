@@ -53,11 +53,9 @@ const bot = mineflayer.createBot({
 bot.loadPlugin(autoeat)
 
 bot.once("spawn", () => {
-  bot.autoEat.options = {
-    priority: "foodPoints",
-    startAt: 14,
-    bannedFood: [],
-  }
+  bot.autoEat.options.priority = "foodPoints"
+  bot.autoEat.options.bannedFood = []
+  bot.autoEat.options.eatingTimeout = 3
 })
 
 // The bot eats food automatically and emits these events when it starts eating and stops eating.
@@ -103,13 +101,12 @@ bot.once("spawn", () => {
 ```
 
 #### bot.autoEat.options.priority
-Acceptable Values are "saturation" or "foodPoints"
-When choosing "saturation" the bot will search for the food with the highest saturation instead of highest food points
+Acceptable Values are "saturation", "foodPoints" or "effectiveQuality"
 
 default: "foodPoints"
 
 #### bot.autoEat.options.startAt
-If the bot reaches that number of food points the bot will start to eat
+If the bot has less food points than that number, it will start eating
 
 default: 14
 
@@ -117,6 +114,24 @@ default: 14
 The bot will not eat the items in the array unless they are the only items available
 
 default: []
+
+#### bot.autoEat.options.ignoreInventoryCheck
+Forces bot to disable inventory window click confirmation.
+Related to [PrismarineJS/mineflayer#2030](https://github.com/PrismarineJS/mineflayer/issues/2030)
+
+default: false
+
+#### bot.autoEat.options.checkOnItemPickup
+Attempts to find food in inventory on item pickup
+
+default: false
+
+#### bot.autoEat.options.eatingTimeout
+Timeout of food consumption. If eating takes too long, we're assuming that
+it is finished after that time. Time in seconds, null or negative value means
+"no timeout".
+
+default: 3
 
 ### Methods
 
