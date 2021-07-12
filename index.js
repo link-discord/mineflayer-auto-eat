@@ -11,18 +11,28 @@ module.exports = function (bot, options) {
 
 	bot.autoEat.eat = eat
 
-	bot.autoEat.options = {}
-	bot.autoEat.options.priority = options.priority || 'foodPoints'
-	bot.autoEat.options.startAt = options.startAt || 14
-	bot.autoEat.options.bannedFood = options.bannedFood || []
-	// https://github.com/PrismarineJS/mineflayer/issues/2030
-	bot.autoEat.options.autofixIssue2030 = options.autofixIssue2030 || false
+	bot.autoEat.options = {
+		priority: options.priority || 'foodPoints',
+		startAt: options.startAt || 14,
+		bannedFood: options.bannedFood || [],
+		ignoreInventoryCheck: options.ignoreInventoryCheck || false,
+		checkOnItemPickup: options.checkOnItemPickup || false,
+		eatingTimeout: options.eatingTimeout || 3
+	}
 
 	bot.autoEat.foodsByName = {}
 
 	bot.once('spawn', () => {
 		bot.autoEat.foodsByName = require('minecraft-data')(bot.version).foodsByName
 	})
+
+	function timeoutAfter(time, message) {
+		return new Promise((_, reject) => {
+			setTimeout(() => {
+				reject(new Error(message))
+			}, time)
+		})
+	}
 
 	function eat(callback, manual = false) {
 		callback = callback || ((e) => { }) // fallback callback that does nothing
@@ -52,12 +62,20 @@ module.exports = function (bot, options) {
 		(async () => {
 			try {
 				const requiresConfirmation = bot.inventory.requiresConfirmation
-				if (bot.autoEat.options.autofixIssue2030)
+				if (bot.autoEat.options.ignoreInventoryCheck)
 					bot.inventory.requiresConfirmation = false
 				await bot.equip(bestFood, 'hand')
-				if (bot.autoEat.options.autofixIssue2030)
-					bot.inventory.requiresConfirmation = requiresConfirmation
-				await bot.consume()
+				bot.inventory.requiresConfirmation = requiresConfirmation
+				if (bot.autoEat.options.eatingTimeout !== null
+					&& bot.autoEat.options.eatingTimeout > 0) {
+					const timeout = bot.autoEat.options.eatingTimeout * 1000;
+					await Promise.race([
+						bot.consume(),
+						timeoutAfter(timeout, 'Eating took too long')
+					])
+				} else {
+					await bot.consume()
+				}
 			} catch (error) {
 				bot.emit('autoeat_stopped', error)
 				bot.autoEat.isEating = false
@@ -76,8 +94,20 @@ module.exports = function (bot, options) {
 			if (bot.pathfinder.isMining() || bot.pathfinder.isBuilding())
 				return
 		}
-		bot.autoEat.eat()
+		try {
+			bot.autoEat.eat()
+		} catch (e) { /* ignore */ }
 	})
+	
+	bot.on('playerCollect', async (who) => {
+		if (who.username !== bot.username
+			|| !bot.autoEat.options.checkOnItemPickup) return;
+		
+		try {
+			await bot.waitForTicks(1)
+			bot.autoEat.eat()
+		} catch (e) { /* ignore */ }
+	});
 
 	bot.on('spawn', () => {
 		bot.autoEat.isEating = false // Eating status is reset on spawn/death
