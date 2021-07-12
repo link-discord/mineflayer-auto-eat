@@ -84,6 +84,8 @@ module.exports = function (bot, options) {
 			bot.emit('autoeat_stopped')
 			bot.autoEat.isEating = false
 			callback(null)
+			if (bot.food < bot.autoEat.options.startAt)
+				eat();
 		})()
 	}
 
@@ -98,11 +100,11 @@ module.exports = function (bot, options) {
 			bot.autoEat.eat()
 		} catch (e) { /* ignore */ }
 	})
-	
+
 	bot.on('playerCollect', async (who) => {
 		if (who.username !== bot.username
 			|| !bot.autoEat.options.checkOnItemPickup) return;
-		
+
 		try {
 			await bot.waitForTicks(1)
 			bot.autoEat.eat()
