@@ -143,7 +143,7 @@ Calling this function will enable the plugin
 Calling this function will disable the plugin
 
 ### bot.autoEat.eat()
-If you want to for some ever reason want to call the eat function manually 
+If you want to call the eat function manually 
 you can do it like this below
 ```js
 bot.autoEat.eat(function (err) {
