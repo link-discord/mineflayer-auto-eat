@@ -89,7 +89,7 @@ module.exports = function (bot, options) {
 
             callback(null)
 
-            if (bot.food <= bot.autoEat.options.startAt) eat()
+            if (bot.food < bot.autoEat.options.startAt || bot.food === bot.autoEat.options.startAt) eat()
         })()
     }
 
