@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "target": "ES2020", /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */
+        "module": "commonjs", /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */
+        "allowJs": true, /* Allow javascript files to be compiled. */
+        "checkJs": false, /* Report errors in .js files. */
+        "declaration": true,
+        "outDir": "./lib",
+        "strict": true,
+        "strictNullChecks": false, /* Enable strict null checks. */
+        "alwaysStrict": true, /* Parse in strict mode and emit "use strict" for each source file. */
+        "noUnusedLocals": true, /* Report errors on unused locals. */
+        "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
+        "esModuleInterop": true, /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+        "skipLibCheck": true, /* Skip type checking of declaration files. */
+        "forceConsistentCasingInFileNames": true, /* Disallow inconsistently-cased references to the same file. */
+        "resolveJsonModule": true
+    },
+    "exclude": [
+        "node_modules",
+        "test",
+        "lib"
+    ]
+}

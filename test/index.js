@@ -1,3 +1,4 @@
+// @ts-nocheck
 const mineflayer = require('mineflayer')
 const autoeat = require('../index')
 

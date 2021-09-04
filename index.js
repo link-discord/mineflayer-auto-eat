@@ -1,3 +1,4 @@
+// @ts-nocheck
 module.exports = function (bot, options) {
     bot.autoEat = { disabled: false, isEating: false }
 
