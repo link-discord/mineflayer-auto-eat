@@ -23,6 +23,6 @@
         "url": "https://github.com/LINKdiscordd/mineflayer-auto-eat"
     },
     "dependencies": {
-        "minecraft-data": "^2.93.0"
+        "minecraft-data": "^2.100.0"
     }
 }
