@@ -159,7 +159,7 @@ bot.autoEat.eat(function (err) {
 
 👤 **Link#0069**
 
-- Github: [@LINKdiscordd](https://github.com/LINKdiscordd)
+- Github: [@link-discord](https://github.com/link-discord)
 
 ## Show your support
 
