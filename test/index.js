@@ -30,11 +30,9 @@ function display(passed, message) {
     if (passed === undefined) return
     
     if (passed === true) {
-        console.log()
         log(`✅ ${message}`)
         process.exit(0)
     } else {
-        console.log()
         log(`❌ ${message}`)
         process.exit(1)
     }
