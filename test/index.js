@@ -20,7 +20,15 @@ function display(passed, message) {
     console.log(`🍗 Food: ${bot.food}`)
     console.log(`🍔 Saturation: ${Math.floor(bot.foodSaturation)}`)
 
-    if (passed !== undefined) console.log(`${passed ? '✅' : '❌'} ${message}`)
+    if (passed === undefined) return
+    
+    if (passed === true) {
+        console.log(`✅ ${message}`)
+        process.exit(0)
+    } else {
+        console.log(`❌ ${message}`)
+        process.exit(1)
+    }
 }
 
 bot.on('end', (reason) => {
@@ -29,7 +37,6 @@ bot.on('end', (reason) => {
 
 bot.on('autoeat_error', (err) => {
     display(false, err.message)
-    process.exit(1)
 })
 
 bot.on('autoeat_started', (item) => {
@@ -37,10 +44,8 @@ bot.on('autoeat_started', (item) => {
 
     if (priority === 'foodPoints' && item.name === 'golden_carrot') {
         display(false, 'Priority is foodPoints but golden carrot is being eaten')
-        process.exit(1)
     } else if (priority === 'saturation' && item.name === 'cooked_beef') {
         display(false, 'Priority is saturation but cooked beef is being eaten')
-        process.exit(1)
     }
 })
 
@@ -49,11 +54,9 @@ bot.on('autoeat_finished', async (item, offhand) => {
 
     if (bot.autoEat.options.priority === 'saturation' && bot.foodSaturation < 14) {
         display(false, 'Saturation is too low')
-        process.exit(1)
     }
 
     display(true, `Finished eating ${item.name} in ${offhand ? 'offhand' : 'hand'}`)
-    process.exit(0)
 })
 
 bot.on('health', () => {
@@ -61,7 +64,6 @@ bot.on('health', () => {
 
     if (bot.food < 10) {
         display(false, 'Food went below 10')
-        process.exit(1)
     }
 })
 
