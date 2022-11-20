@@ -62,15 +62,19 @@ export default function plugin(bot: mineflayer.Bot) {
     }
 
     bot.autoEat.eat = async (offhand = bot.autoEat.options.useOffhand) => {
-        if (bot.autoEat.isEating || bot.food > bot.autoEat.options.startAt) return
+        if (bot.autoEat.isEating || bot.autoEat.disabled || bot.food > bot.autoEat.options.startAt) return
         bot.autoEat.isEating = true
 
         const priority = bot.autoEat.options.priority
         const banned = bot.autoEat.options.bannedFood
         const food = bot.registry.foodsByName
 
-        const bestChoices = bot.inventory
-            .items()
+        const items = bot.inventory.items()
+        const offhandItem = bot.inventory.slots[45]
+
+        if (offhandItem) items.push(offhandItem)
+
+        const bestChoices = items
             .filter((item) => item.name in bot.registry.foodsByName)
             .filter((item) => !banned.includes(item.name))
             .sort((a, b) => food[b.name][priority] - food[a.name][priority])
@@ -83,18 +87,6 @@ export default function plugin(bot: mineflayer.Bot) {
 
         const bestFood = bestChoices[0]
         const usedHand: mineflayer.EquipmentDestination = offhand ? 'off-hand' : 'hand'
-
-        async function waitEating() {
-            const time = performance.now()
-
-            while (
-                bot.autoEat.isEating &&
-                performance.now() - time < bot.autoEat.options.eatingTimeout &&
-                bot.inventory.slots[bot.getEquipmentDestSlot(usedHand)]?.name === bestFood.name
-            ) {
-                await sleep()
-            }
-        }
 
         bot.emit('autoeat_started', bestFood, offhand)
 
@@ -111,7 +103,15 @@ export default function plugin(bot: mineflayer.Bot) {
         bot.deactivateItem()
         bot.activateItem(offhand)
 
-        await waitEating()
+        const time = performance.now()
+
+        while (
+            bot.autoEat.isEating &&
+            performance.now() - time < bot.autoEat.options.eatingTimeout &&
+            bot.inventory.slots[bot.getEquipmentDestSlot(usedHand)]?.name === bestFood.name
+        ) {
+            await sleep()
+        }
 
         if (bot.autoEat.options.equipOldItem && oldItem && oldItem.name !== bestFood.name) {
             await bot.equip(oldItem, usedHand)
@@ -121,17 +121,8 @@ export default function plugin(bot: mineflayer.Bot) {
         bot.emit('autoeat_finished', bestFood, offhand)
     }
 
-    bot.on('playerCollect', async (who, entity) => {
-        const itemName = entity.getDroppedItem()?.name
-
-        if (
-            !itemName ||
-            !bot.registry.foodsByName[itemName] ||
-            !bot.autoEat.options.checkOnItemPickup ||
-            who.username !== bot.username ||
-            bot.autoEat.disabled
-        )
-            return
+    bot.on('playerCollect', async (who) => {
+        if (!bot.autoEat.options.checkOnItemPickup || who.username !== bot.username) return
 
         try {
             await bot.waitForTicks(1)
@@ -142,8 +133,6 @@ export default function plugin(bot: mineflayer.Bot) {
     })
 
     bot.on('health', async () => {
-        if (bot.autoEat.isEating) return
-
         try {
             await bot.autoEat.eat()
         } catch (error) {

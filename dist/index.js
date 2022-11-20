@@ -23,7 +23,7 @@ function plugin(bot) {
         bot.autoEat.disabled = false;
     };
     bot.autoEat.eat = async (offhand = bot.autoEat.options.useOffhand) => {
-        if (bot.autoEat.isEating || bot.food > bot.autoEat.options.startAt)
+        if (bot.autoEat.isEating || bot.autoEat.disabled || bot.food > bot.autoEat.options.startAt)
             return;
         bot.autoEat.isEating = true;
         const priority = bot.autoEat.options.priority;
@@ -65,13 +65,8 @@ function plugin(bot) {
         bot.autoEat.isEating = false;
         bot.emit('autoeat_finished', bestFood, offhand);
     };
-    bot.on('playerCollect', async (who, entity) => {
-        const itemName = entity.getDroppedItem()?.name;
-        if (!itemName ||
-            !bot.registry.foodsByName[itemName] ||
-            !bot.autoEat.options.checkOnItemPickup ||
-            who.username !== bot.username ||
-            bot.autoEat.disabled)
+    bot.on('playerCollect', async (who) => {
+        if (!bot.autoEat.options.checkOnItemPickup || who.username !== bot.username)
             return;
         try {
             await bot.waitForTicks(1);
@@ -82,8 +77,6 @@ function plugin(bot) {
         }
     });
     bot.on('health', async () => {
-        if (bot.autoEat.isEating)
-            return;
         try {
             await bot.autoEat.eat();
         }
