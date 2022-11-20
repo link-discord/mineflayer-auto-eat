@@ -1,5 +1,7 @@
 const mineflayer = require('mineflayer')
 const autoEat = require('../dist/index.js').default
+const ms = require('ms')
+const start = Date.now()
 
 const bot = mineflayer.createBot({
     host: process.env.HOST,
@@ -10,23 +12,30 @@ const bot = mineflayer.createBot({
 
 bot.loadPlugin(autoEat)
 
+function log(message) {
+    if (process.env.CI) console.log(ms(start - Date.now()), message)
+    else console.log(message)
+}
+
 function display(passed, message) {
     console.clear()
 
     const usingOffhand = bot.autoEat.options.useOffhand
     const currentItem = bot.inventory.slots[bot.getEquipmentDestSlot(usingOffhand ? 'off-hand' : 'hand')]
 
-    console.log(`🍖 Item: ${currentItem ? currentItem.name : 'empty'}`)
-    console.log(`🍗 Food: ${bot.food}`)
-    console.log(`🍔 Saturation: ${Math.floor(bot.foodSaturation)}`)
+    log(`🍖 Item: ${currentItem ? currentItem.name : 'empty'}`)
+    log(`🍗 Food: ${bot.food}`)
+    log(`🍔 Saturation: ${Math.floor(bot.foodSaturation)}`)
 
     if (passed === undefined) return
     
     if (passed === true) {
-        console.log(`✅ ${message}`)
+        console.log()
+        log(`✅ ${message}`)
         process.exit(0)
     } else {
-        console.log(`❌ ${message}`)
+        console.log()
+        log(`❌ ${message}`)
         process.exit(1)
     }
 }
