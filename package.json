@@ -1,12 +1,12 @@
 {
     "name": "mineflayer-auto-eat",
-    "version": "2.3.3",
+    "version": "3.0.0",
     "description": "An auto eat plugin for mineflayer",
     "main": "index.js",
-    "types": "lib/index.d.ts",
+    "types": "dist/index.d.ts",
     "scripts": {
-        "test": "node ./test/index.js",
-        "prepare": "tsc"
+        "build": "tsc",
+        "test": "node ./test/index.js"
     },
     "keywords": [
         "mineflayer",
@@ -17,12 +17,18 @@
         "eat"
     ],
     "author": "Link#0069",
-    "license": "ISC",
+    "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/LINKdiscordd/mineflayer-auto-eat"
+        "url": "https://github.com/link-discord/mineflayer-auto-eat"
     },
     "dependencies": {
-        "minecraft-data": "^2.100.0"
+        "mineflayer": "^4.5.1"
+    },
+    "devDependencies": {
+        "doctoc": "^2.2.1",
+        "minecraft-data": "^3.18.0",
+        "prismarine-item": "^1.12.1",
+        "typescript": "^4.9.3"
     }
 }

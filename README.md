@@ -1,16 +1,23 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
 - [mineflayer-auto-eat](#mineflayer-auto-eat)
   - [Install](#install)
-  - [Usage](#usage)
+  - [Example](#example)
   - [API](#api)
     - [Properties](#properties)
-      - [bot.autoEat](#botautoeat)
+      - [bot.autoEat.disabled](#botautoeatdisabled)
+      - [bot.autoEat.isEating](#botautoeatiseating)
       - [bot.autoEat.options](#botautoeatoptions)
       - [bot.autoEat.options.priority](#botautoeatoptionspriority)
       - [bot.autoEat.options.startAt](#botautoeatoptionsstartat)
       - [bot.autoEat.options.bannedFood](#botautoeatoptionsbannedfood)
+      - [bot.autoEat.options.ignoreInventoryCheck](#botautoeatoptionsignoreinventorycheck)
+      - [bot.autoEat.options.checkOnItemPickup](#botautoeatoptionscheckonitempickup)
+      - [bot.autoEat.options.eatingTimeout](#botautoeatoptionseatingtimeout)
+      - [bot.autoEat.options.useOffhand](#botautoeatoptionsuseoffhand)
+      - [bot.autoEat.options.equipOldItem](#botautoeatoptionsequipolditem)
     - [Methods](#methods)
       - [bot.autoEat.enable()](#botautoeatenable)
       - [bot.autoEat.disable()](#botautoeatdisable)
@@ -22,9 +29,9 @@
 
 <h1 align="center">mineflayer-auto-eat</h1>
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.2.0-blue.svg?cacheSeconds=2592000" />
+  <img alt="Version" src="https://img.shields.io/badge/version-3.0.0-blue.svg?cacheSeconds=2592000" />
   <a href="#" target="_blank">
-    <img alt="License: ISC" src="https://img.shields.io/badge/License-ISC-yellow.svg" />
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
   </a>
 </p>
 
@@ -39,39 +46,28 @@ npm install mineflayer-auto-eat
 ## Example
 
 ```js
-const mineflayer = require("mineflayer")
-const autoeat = require("mineflayer-auto-eat")
+const mineflayer = require('mineflayer')
+const autoeat = require('mineflayer-auto-eat').default
 
 const bot = mineflayer.createBot({
-  host: process.argv[2],
-  port: process.argv[3],
-  username: process.argv[4],
-  password: process.argv[5],
+    host: process.argv[2],
+    port: process.argv[3],
+    username: process.argv[4],
+    password: process.argv[5]
 })
 
-// Load the plugin
-bot.loadPlugin(autoeat)
+bot.loadPlugin(autoEat)
 
-bot.once("spawn", () => {
-  bot.autoEat.options.priority = "foodPoints"
-  bot.autoEat.options.bannedFood = []
-  bot.autoEat.options.eatingTimeout = 3
+bot.on('autoeat_started', (item, offhand) => {
+    console.log(`Eating ${item.displayName} in ${offhand ? 'offhand' : 'hand'}`)
 })
 
-// The bot eats food automatically and emits these events when it starts eating and stops eating.
-
-bot.on("autoeat_started", () => {
-  console.log("Auto Eat started!")
+bot.on('autoeat_error', (error) => {
+    console.error(error)
 })
 
-bot.on("autoeat_stopped", () => {
-  console.log("Auto Eat stopped!")
-})
-
-bot.on("health", () => {
-  if (bot.food === 20) bot.autoEat.disable()
-  // Disable the plugin if the bot is at 20 food points
-  else bot.autoEat.enable() // Else enable the plugin again
+bot.on('autoeat_finished', (item, offhand) => {
+    console.log(`Finished eating ${item.displayName} in ${offhand ? 'offhand' : 'hand'}`)
 })
 ```
 
@@ -79,92 +75,123 @@ bot.on("health", () => {
 
 ### Properties
 
-#### bot.autoEat
+#### bot.autoEat.disabled
 
-Includes Objects
+Boolean value indicating whether auto eat is disabled or not.
+
+#### bot.autoEat.isEating
+
+Boolean value indicating whether the bot is currently eating or not.
+This value should never be set manually.
 
 #### bot.autoEat.options
 
 Can be changed to change the settings for the auto eat plugin
-(Can only be changed when the bot has spawned or else you get an Error)
+(Should only be changed when the bot has spawned)
 
 Example
 
 ```js
-bot.once("spawn", () => {
-  bot.autoEat.options = {
-    priority: "saturation",
-    startAt: 16,
-    bannedFood: ["golden_apple", "enchanted_golden_apple", "rotten_flesh"],
-  }
+bot.once('spawn', () => {
+    bot.autoEat.options = {
+        priority: 'saturation',
+        startAt: 16,
+        bannedFood: ['golden_apple', 'enchanted_golden_apple', 'rotten_flesh']
+    }
 })
 ```
 
 #### bot.autoEat.options.priority
-Acceptable Values are "saturation", "foodPoints" or "effectiveQuality"
+
+Acceptable Values are "saturation" or "foodPoints"
 
 default: "foodPoints"
 
 #### bot.autoEat.options.startAt
-If the bot has less food points than that number, it will start eating
+
+If the bot has less or equal food points than this value, the bot will start eating
 
 default: 14
 
 #### bot.autoEat.options.bannedFood
-The bot will not eat the items in the array unless they are the only items available
+
+The bot will not eat the items in the array.
 
 default: []
 
 #### bot.autoEat.options.ignoreInventoryCheck
+
 Forces bot to disable inventory window click confirmation.
 Related to [PrismarineJS/mineflayer#2030](https://github.com/PrismarineJS/mineflayer/issues/2030)
 
 default: false
 
 #### bot.autoEat.options.checkOnItemPickup
-Attempts to find food in inventory on item pickup
 
-default: false
+Attempts to eat food when the bot picks up an item and the bot reached the startAt threshold.
+
+default: true
 
 #### bot.autoEat.options.eatingTimeout
+
 Timeout of food consumption. If eating takes too long, we're assuming that
 it is finished after that time. Time in seconds, null or negative value means
 "no timeout".
 
 default: 3
 
+#### bot.autoEat.options.useOffhand
+
+If true, the bot will use the offhand slot to eat food.
+
+default: false
+
+#### bot.autoEat.options.equipOldItem
+
+If true, the bot will equip the previous item after eating.
+
+default: true
+
 ### Methods
 
 #### bot.autoEat.enable()
+
 Calling this function will enable the plugin
 (its enabled by default ofc)
 
 #### bot.autoEat.disable()
+
 Calling this function will disable the plugin
 
-### bot.autoEat.eat()
-If you want to call the eat function manually 
+#### bot.autoEat.eat()
+
+If you want to call the eat function manually
 you can do it like this below
+
 ```js
-bot.autoEat.eat(function (err) {
-    if (err) {
-      console.error(err)
-    } else {
-      console.log('Success!')
-    }
-})
+bot.autoEat
+    // Setting to true will use offhand slot
+    .eat(true)
+    .then(() => {
+        console.log('Finished eating')
+    })
+    .catch((error) => {
+        console.error(error)
+    })
 ```
 
 ## Author
 
 👤 **Link#0069**
 
-- Github: [@link-discord](https://github.com/link-discord)
+-   Github: [@link-discord](https://github.com/link-discord)
 
 ## Show your support
 
 Give a ⭐️ if this plugin helped you!
 
-***
+---
 
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
+```
+
+```
