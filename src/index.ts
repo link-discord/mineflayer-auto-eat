@@ -84,6 +84,18 @@ export default function plugin(bot: mineflayer.Bot) {
         const bestFood = bestChoices[0]
         const usedHand: mineflayer.EquipmentDestination = offhand ? 'off-hand' : 'hand'
 
+        async function waitEating() {
+            const time = performance.now()
+    
+            while (
+                bot.autoEat.isEating &&
+                performance.now() - time < bot.autoEat.options.eatingTimeout &&
+                bot.inventory.slots[bot.getEquipmentDestSlot(usedHand)]?.name === bestFood.name
+            ) {
+                await sleep()
+            }
+        }
+
         bot.emit('autoeat_started', bestFood, offhand)
 
         const requiresConfirmation = bot.inventory.requiresConfirmation
@@ -99,15 +111,7 @@ export default function plugin(bot: mineflayer.Bot) {
         bot.deactivateItem()
         bot.activateItem(offhand)
 
-        const time = performance.now()
-
-        while (
-            bot.autoEat.isEating &&
-            performance.now() - time < bot.autoEat.options.eatingTimeout &&
-            bot.inventory.slots[bot.getEquipmentDestSlot(usedHand)]?.name === bestFood.name
-        ) {
-            await sleep()
-        }
+        await waitEating()
 
         if (bot.autoEat.options.equipOldItem && oldItem) {
             await bot.equip(oldItem, usedHand)
