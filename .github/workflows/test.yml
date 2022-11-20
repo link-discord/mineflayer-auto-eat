@@ -21,5 +21,6 @@ jobs:
       - name: Start Testing
         run: npm run test
         env:
+          CI: true
           HOST: ${{ secrets.HOST }}
           PORT: ${{ secrets.PORT }}
