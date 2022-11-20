@@ -32,7 +32,7 @@
 ![npm](https://img.shields.io/npm/v/mineflayer-auto-eat)
 ![npm bundle size](https://img.shields.io/bundlephobia/min/mineflayer-auto-eat)
 ![CI](https://github.com/link-discord/mineflayer-auto-eat/actions/workflows/ci.yml/badge.svg)
-![GitHub](https://img.shields.io/github/license/link-discord/mineflayer-auto-eat?logoColor=yellow)
+![GitHub](https://img.shields.io/github/license/link-discord/mineflayer-auto-eat?color=yellow)
 
 > An auto eat plugin for mineflayer
 
