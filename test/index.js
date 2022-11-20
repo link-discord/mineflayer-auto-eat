@@ -13,7 +13,7 @@ const bot = mineflayer.createBot({
 bot.loadPlugin(autoEat)
 
 function log(message) {
-    if (process.env.CI) console.log(ms(start - Date.now()), message)
+    if (process.env.CI) console.log(`[${ms(Date.now() - start)}]`, message)
     else console.log(message)
 }
 
