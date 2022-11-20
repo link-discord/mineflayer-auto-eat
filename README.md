@@ -59,7 +59,7 @@ const bot = mineflayer.createBot({
 bot.loadPlugin(autoEat)
 
 bot.on('autoeat_started', (item, offhand) => {
-    console.log(`Eating ${item.displayName} in ${offhand ? 'offhand' : 'hand'}`)
+    console.log(`Eating ${item.name} in ${offhand ? 'offhand' : 'hand'}`)
 })
 
 bot.on('autoeat_error', (error) => {
@@ -67,7 +67,7 @@ bot.on('autoeat_error', (error) => {
 })
 
 bot.on('autoeat_finished', (item, offhand) => {
-    console.log(`Finished eating ${item.displayName} in ${offhand ? 'offhand' : 'hand'}`)
+    console.log(`Finished eating ${item.name} in ${offhand ? 'offhand' : 'hand'}`)
 })
 ```
 
