@@ -34,7 +34,7 @@
 ![CI](https://github.com/link-discord/mineflayer-auto-eat/actions/workflows/ci.yml/badge.svg)
 ![GitHub](https://img.shields.io/github/license/link-discord/mineflayer-auto-eat?color=red)
 
-> An auto eat plugin for mineflayer
+> Auto eat plugin for mineflayer
 
 ## Install
 
