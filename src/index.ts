@@ -62,7 +62,7 @@ export default function plugin(bot: mineflayer.Bot) {
     }
 
     bot.autoEat.eat = async (offhand = bot.autoEat.options.useOffhand) => {
-        if (bot.autoEat.isEating) return
+        if (bot.autoEat.isEating || bot.food > bot.autoEat.options.startAt) return
         bot.autoEat.isEating = true
 
         const priority = bot.autoEat.options.priority
@@ -86,7 +86,7 @@ export default function plugin(bot: mineflayer.Bot) {
 
         async function waitEating() {
             const time = performance.now()
-    
+
             while (
                 bot.autoEat.isEating &&
                 performance.now() - time < bot.autoEat.options.eatingTimeout &&
@@ -113,7 +113,7 @@ export default function plugin(bot: mineflayer.Bot) {
 
         await waitEating()
 
-        if (bot.autoEat.options.equipOldItem && oldItem) {
+        if (bot.autoEat.options.equipOldItem && oldItem && oldItem.name !== bestFood.name) {
             await bot.equip(oldItem, usedHand)
         }
 
@@ -125,12 +125,11 @@ export default function plugin(bot: mineflayer.Bot) {
         const itemName = entity.getDroppedItem()?.name
 
         if (
-            itemName === undefined ||
+            !itemName ||
+            !bot.registry.foodsByName[itemName] ||
+            !bot.autoEat.options.checkOnItemPickup ||
             who.username !== bot.username ||
-            bot.autoEat.options.checkOnItemPickup === false ||
-            bot.autoEat.disabled === true ||
-            bot.food > bot.autoEat.options.startAt ||
-            bot.registry.foodsByName[itemName] === undefined
+            bot.autoEat.disabled
         )
             return
 
@@ -143,7 +142,7 @@ export default function plugin(bot: mineflayer.Bot) {
     })
 
     bot.on('health', async () => {
-        if (bot.food > bot.autoEat.options.startAt || bot.autoEat.disabled === true) return
+        if (bot.autoEat.isEating) return
 
         try {
             await bot.autoEat.eat()

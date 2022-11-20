@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms = 0) => new Promise((resolve) => setTimeout(resolve, ms));
 function plugin(bot) {
     // @ts-ignore - Initializations
     bot.autoEat = {};
@@ -23,7 +23,7 @@ function plugin(bot) {
         bot.autoEat.disabled = false;
     };
     bot.autoEat.eat = async (offhand = bot.autoEat.options.useOffhand) => {
-        if (bot.autoEat.isEating)
+        if (bot.autoEat.isEating || bot.food > bot.autoEat.options.startAt)
             return;
         bot.autoEat.isEating = true;
         const priority = bot.autoEat.options.priority;
@@ -41,6 +41,14 @@ function plugin(bot) {
         }
         const bestFood = bestChoices[0];
         const usedHand = offhand ? 'off-hand' : 'hand';
+        async function waitEating() {
+            const time = performance.now();
+            while (bot.autoEat.isEating &&
+                performance.now() - time < bot.autoEat.options.eatingTimeout &&
+                bot.inventory.slots[bot.getEquipmentDestSlot(usedHand)]?.name === bestFood.name) {
+                await sleep();
+            }
+        }
         bot.emit('autoeat_started', bestFood, offhand);
         const requiresConfirmation = bot.inventory.requiresConfirmation;
         if (bot.autoEat.options.ignoreInventoryCheck)
@@ -50,13 +58,8 @@ function plugin(bot) {
         bot.inventory.requiresConfirmation = requiresConfirmation;
         bot.deactivateItem();
         bot.activateItem(offhand);
-        const time = performance.now();
-        while (bot.autoEat.isEating &&
-            performance.now() - time < bot.autoEat.options.eatingTimeout &&
-            bot.inventory.slots[bot.getEquipmentDestSlot(usedHand)]?.name === bestFood.name) {
-            await sleep(0);
-        }
-        if (bot.autoEat.options.equipOldItem && oldItem) {
+        await waitEating();
+        if (bot.autoEat.options.equipOldItem && oldItem && oldItem.name !== bestFood.name) {
             await bot.equip(oldItem, usedHand);
         }
         bot.autoEat.isEating = false;
@@ -64,12 +67,11 @@ function plugin(bot) {
     };
     bot.on('playerCollect', async (who, entity) => {
         const itemName = entity.getDroppedItem()?.name;
-        if (itemName === undefined ||
+        if (!itemName ||
+            !bot.registry.foodsByName[itemName] ||
+            !bot.autoEat.options.checkOnItemPickup ||
             who.username !== bot.username ||
-            bot.autoEat.options.checkOnItemPickup === false ||
-            bot.autoEat.disabled === true ||
-            bot.food > bot.autoEat.options.startAt ||
-            bot.registry.foodsByName[itemName] === undefined)
+            bot.autoEat.disabled)
             return;
         try {
             await bot.waitForTicks(1);
@@ -80,7 +82,7 @@ function plugin(bot) {
         }
     });
     bot.on('health', async () => {
-        if (bot.food > bot.autoEat.options.startAt || bot.autoEat.disabled === true)
+        if (bot.autoEat.isEating)
             return;
         try {
             await bot.autoEat.eat();
