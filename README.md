@@ -184,6 +184,7 @@ bot.autoEat
 👤 **Link#0069**
 
 -   Github: [@link-discord](https://github.com/link-discord)
+-   Twitter: [@link0069](https://twitter.com/link0069)
 
 ## Show your support
 
