@@ -55,7 +55,7 @@ const bot = mineflayer.createBot({
     password: process.argv[5]
 })
 
-bot.loadPlugin(autoEat)
+bot.loadPlugin(autoeat)
 
 bot.on('autoeat_started', (item, offhand) => {
     console.log(`Eating ${item.name} in ${offhand ? 'offhand' : 'hand'}`)
