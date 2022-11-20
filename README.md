@@ -28,12 +28,11 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 <h1 align="center">mineflayer-auto-eat</h1>
-<p>
-  <img alt="Version" src="https://img.shields.io/badge/version-3.0.0-blue.svg?cacheSeconds=2592000" />
-  <a href="#" target="_blank">
-    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
-  </a>
-</p>
+
+![npm](https://img.shields.io/npm/v/mineflayer-auto-eat)
+![npm bundle size](https://img.shields.io/bundlephobia/min/mineflayer-auto-eat)
+![CI](https://github.com/link-discord/mineflayer-auto-eat/actions/workflows/ci.yml/badge.svg)
+![GitHub](https://img.shields.io/github/license/link-discord/mineflayer-auto-eat)
 
 > An auto eat plugin for mineflayer
 
