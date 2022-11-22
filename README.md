@@ -189,7 +189,3 @@ bot.autoEat
 Give a ⭐️ if this plugin helped you!
 
 ---
-
-```
-
-```
