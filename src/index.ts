@@ -46,7 +46,7 @@ export default function plugin(bot: mineflayer.Bot) {
         priority: 'foodPoints',
         startAt: 14,
         eatingTimeout: 3000,
-        bannedFood: [],
+        bannedFood: ['pufferfish', 'spider_eye', 'poisonous_potato', 'rotten_flesh'],
         ignoreInventoryCheck: false,
         checkOnItemPickup: true,
         useOffhand: false,
