@@ -187,5 +187,3 @@ bot.autoEat
 ## Show your support
 
 Give a ⭐️ if this plugin helped you!
-
----
