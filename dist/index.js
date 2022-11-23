@@ -10,7 +10,7 @@ function plugin(bot) {
         priority: 'foodPoints',
         startAt: 14,
         eatingTimeout: 3000,
-        bannedFood: [],
+        bannedFood: ['pufferfish', 'spider_eye', 'poisonous_potato', 'rotten_flesh'],
         ignoreInventoryCheck: false,
         checkOnItemPickup: true,
         useOffhand: false,
@@ -29,26 +29,20 @@ function plugin(bot) {
         const priority = bot.autoEat.options.priority;
         const banned = bot.autoEat.options.bannedFood;
         const food = bot.registry.foodsByName;
-        const bestChoices = bot.inventory
-            .items()
+        const items = bot.inventory.items();
+        const offhandItem = bot.inventory.slots[45];
+        if (offhandItem)
+            items.push(offhandItem);
+        const bestChoices = items
             .filter((item) => item.name in bot.registry.foodsByName)
             .filter((item) => !banned.includes(item.name))
             .sort((a, b) => food[b.name][priority] - food[a.name][priority]);
         if (bestChoices.length === 0) {
             bot.autoEat.isEating = false;
-            bot.emit('autoeat_error', new Error('No Food found.'));
-            return;
+            throw new Error('No food found.');
         }
         const bestFood = bestChoices[0];
         const usedHand = offhand ? 'off-hand' : 'hand';
-        async function waitEating() {
-            const time = performance.now();
-            while (bot.autoEat.isEating &&
-                performance.now() - time < bot.autoEat.options.eatingTimeout &&
-                bot.inventory.slots[bot.getEquipmentDestSlot(usedHand)]?.name === bestFood.name) {
-                await sleep();
-            }
-        }
         bot.emit('autoeat_started', bestFood, offhand);
         const requiresConfirmation = bot.inventory.requiresConfirmation;
         if (bot.autoEat.options.ignoreInventoryCheck)
@@ -58,7 +52,12 @@ function plugin(bot) {
         bot.inventory.requiresConfirmation = requiresConfirmation;
         bot.deactivateItem();
         bot.activateItem(offhand);
-        await waitEating();
+        const time = performance.now();
+        while (bot.autoEat.isEating &&
+            performance.now() - time < bot.autoEat.options.eatingTimeout &&
+            bot.inventory.slots[bot.getEquipmentDestSlot(usedHand)]?.name === bestFood.name) {
+            await sleep();
+        }
         if (bot.autoEat.options.equipOldItem && oldItem && oldItem.name !== bestFood.name) {
             await bot.equip(oldItem, usedHand);
         }

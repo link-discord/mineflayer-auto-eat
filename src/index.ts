@@ -81,8 +81,7 @@ export default function plugin(bot: mineflayer.Bot) {
 
         if (bestChoices.length === 0) {
             bot.autoEat.isEating = false
-            bot.emit('autoeat_error', new Error('No Food found.'))
-            return
+            throw new Error('No food found.')
         }
 
         const bestFood = bestChoices[0]
