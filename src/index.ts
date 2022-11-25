@@ -9,7 +9,7 @@ interface Options {
     eatingTimeout: number
     ignoreInventoryCheck: boolean
     checkOnItemPickup: boolean
-    useOffhand: boolean
+    offhand: boolean
     equipOldItem: boolean
 }
 
@@ -20,7 +20,7 @@ declare module 'mineflayer' {
             disabled: boolean
             isEating: boolean
             options: Options
-            eat: (offhand?: boolean) => Promise<void>
+            eat: (offhand?: boolean) => Promise<boolean>
             disable: () => void
             enable: () => void
         }
@@ -49,7 +49,7 @@ export default function plugin(bot: mineflayer.Bot) {
         bannedFood: ['pufferfish', 'spider_eye', 'poisonous_potato', 'rotten_flesh'],
         ignoreInventoryCheck: false,
         checkOnItemPickup: true,
-        useOffhand: false,
+        offhand: false,
         equipOldItem: true
     }
 
@@ -61,18 +61,19 @@ export default function plugin(bot: mineflayer.Bot) {
         bot.autoEat.disabled = false
     }
 
-    bot.autoEat.eat = async (offhand = bot.autoEat.options.useOffhand) => {
-        if (bot.autoEat.isEating || bot.autoEat.disabled || bot.food > bot.autoEat.options.startAt) return
+    bot.autoEat.eat = async (useOffhand = bot.autoEat.options.offhand) => {
+        if (bot.autoEat.isEating || bot.autoEat.disabled || bot.food > bot.autoEat.options.startAt || bot.food > 19) return false
         bot.autoEat.isEating = true
 
+        const canOffhand = !bot.supportFeature('doesntHaveOffHandSlot')
         const priority = bot.autoEat.options.priority
         const banned = bot.autoEat.options.bannedFood
         const food = bot.registry.foodsByName
-
         const items = bot.inventory.items()
         const offhandItem = bot.inventory.slots[45]
+        const offhand = useOffhand && canOffhand
 
-        if (offhandItem) items.push(offhandItem)
+        if (offhandItem && canOffhand) items.push(offhandItem)
 
         const bestChoices = items
             .filter((item) => item.name in bot.registry.foodsByName)
@@ -86,11 +87,6 @@ export default function plugin(bot: mineflayer.Bot) {
 
         const bestFood = bestChoices[0]
         const usedHand: mineflayer.EquipmentDestination = offhand ? 'off-hand' : 'hand'
-
-        if (bot.food === 20 && !bestFood.name.includes('golden_apple')) {
-            bot.autoEat.isEating = false
-            throw new Error('Food is already full.')
-        }
 
         bot.emit('autoeat_started', bestFood, offhand)
 
@@ -123,6 +119,8 @@ export default function plugin(bot: mineflayer.Bot) {
 
         bot.autoEat.isEating = false
         bot.emit('autoeat_finished', bestFood, offhand)
+
+        return true
     }
 
     bot.on('playerCollect', async (who) => {

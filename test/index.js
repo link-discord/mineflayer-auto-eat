@@ -88,12 +88,11 @@ bot.once('spawn', async () => {
 
     await bot.waitForTicks(20)
 
-    try {
-        await bot.autoEat.eat()
-        display(false, 'Eat function tried to eat while not hungry')
-    } catch {
-        bot.chat('/effect give @s resistance 100 255')
-        bot.chat('/effect give @s regeneration 100 255')
-        bot.chat('/effect give @s hunger 10000 100')
-    }
+    const successful = await bot.autoEat.eat()
+    
+    if (successful) display(false, 'Eat function tried to eat while not hungry')
+
+    bot.chat('/effect give @s resistance 100 255')
+    bot.chat('/effect give @s regeneration 100 255')
+    bot.chat('/effect give @s hunger 10000 100')
 })

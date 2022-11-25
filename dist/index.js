@@ -13,7 +13,7 @@ function plugin(bot) {
         bannedFood: ['pufferfish', 'spider_eye', 'poisonous_potato', 'rotten_flesh'],
         ignoreInventoryCheck: false,
         checkOnItemPickup: true,
-        useOffhand: false,
+        offhand: false,
         equipOldItem: true
     };
     bot.autoEat.disable = () => {
@@ -22,16 +22,18 @@ function plugin(bot) {
     bot.autoEat.enable = () => {
         bot.autoEat.disabled = false;
     };
-    bot.autoEat.eat = async (offhand = bot.autoEat.options.useOffhand) => {
-        if (bot.autoEat.isEating || bot.autoEat.disabled || bot.food > bot.autoEat.options.startAt)
-            return;
+    bot.autoEat.eat = async (useOffhand = bot.autoEat.options.offhand) => {
+        if (bot.autoEat.isEating || bot.autoEat.disabled || bot.food > bot.autoEat.options.startAt || bot.food > 19)
+            return false;
         bot.autoEat.isEating = true;
+        const canOffhand = !bot.supportFeature('doesntHaveOffHandSlot');
         const priority = bot.autoEat.options.priority;
         const banned = bot.autoEat.options.bannedFood;
         const food = bot.registry.foodsByName;
         const items = bot.inventory.items();
         const offhandItem = bot.inventory.slots[45];
-        if (offhandItem)
+        const offhand = useOffhand && canOffhand;
+        if (offhandItem && canOffhand)
             items.push(offhandItem);
         const bestChoices = items
             .filter((item) => item.name in bot.registry.foodsByName)
@@ -43,10 +45,6 @@ function plugin(bot) {
         }
         const bestFood = bestChoices[0];
         const usedHand = offhand ? 'off-hand' : 'hand';
-        if (bot.food === 20 && !bestFood.name.includes('golden_apple')) {
-            bot.autoEat.isEating = false;
-            throw new Error('Food is already full.');
-        }
         bot.emit('autoeat_started', bestFood, offhand);
         const requiresConfirmation = bot.inventory.requiresConfirmation;
         if (bot.autoEat.options.ignoreInventoryCheck)
@@ -67,6 +65,7 @@ function plugin(bot) {
         }
         bot.autoEat.isEating = false;
         bot.emit('autoeat_finished', bestFood, offhand);
+        return true;
     };
     bot.on('playerCollect', async (who) => {
         if (!bot.autoEat.options.checkOnItemPickup || who.username !== bot.username)

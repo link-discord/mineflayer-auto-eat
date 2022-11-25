@@ -169,8 +169,8 @@ you can do it like this below
 bot.autoEat
     // Setting to true will use offhand slot
     .eat(true)
-    .then(() => {
-        console.log('Finished eating')
+    .then((successful) => {
+        console.log('Finished executing eating function', successful)
     })
     .catch((error) => {
         console.error(error)

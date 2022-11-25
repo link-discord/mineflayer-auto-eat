@@ -8,7 +8,7 @@ interface Options {
     eatingTimeout: number;
     ignoreInventoryCheck: boolean;
     checkOnItemPickup: boolean;
-    useOffhand: boolean;
+    offhand: boolean;
     equipOldItem: boolean;
 }
 declare module 'mineflayer' {
@@ -18,7 +18,7 @@ declare module 'mineflayer' {
             disabled: boolean;
             isEating: boolean;
             options: Options;
-            eat: (offhand?: boolean) => Promise<void>;
+            eat: (offhand?: boolean) => Promise<boolean>;
             disable: () => void;
             enable: () => void;
         };
