@@ -22,16 +22,18 @@ function plugin(bot) {
     bot.autoEat.enable = () => {
         bot.autoEat.disabled = false;
     };
-    bot.autoEat.eat = async (offhand = bot.autoEat.options.offhand) => {
+    bot.autoEat.eat = async (useOffhand = bot.autoEat.options.offhand) => {
         if (bot.autoEat.isEating || bot.autoEat.disabled || bot.food > bot.autoEat.options.startAt || bot.food > 19)
             return false;
         bot.autoEat.isEating = true;
+        const canOffhand = !bot.supportFeature('doesntHaveOffHandSlot');
         const priority = bot.autoEat.options.priority;
         const banned = bot.autoEat.options.bannedFood;
         const food = bot.registry.foodsByName;
         const items = bot.inventory.items();
         const offhandItem = bot.inventory.slots[45];
-        if (offhandItem && offhand)
+        const offhand = useOffhand && canOffhand;
+        if (offhandItem && canOffhand)
             items.push(offhandItem);
         const bestChoices = items
             .filter((item) => item.name in bot.registry.foodsByName)
