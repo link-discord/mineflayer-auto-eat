@@ -28,7 +28,7 @@ function display(passed, message) {
     log(`🍔 Saturation: ${Math.floor(bot.foodSaturation)}`)
 
     if (passed === undefined) return
-    
+
     if (passed === true) {
         log(`✅ ${message}`)
         process.exit(0)
@@ -85,7 +85,15 @@ bot.once('spawn', async () => {
 
     bot.chat('/give @s minecraft:cooked_beef 64')
     bot.chat('/give @s minecraft:golden_carrot 64')
-    bot.chat('/effect give @s resistance 100 255')
-    bot.chat('/effect give @s regeneration 100 255')
-    bot.chat('/effect give @s hunger 10000 100')
+
+    await bot.waitForTicks(20)
+
+    try {
+        await bot.autoEat.eat()
+        display(false, 'Eat function tried to eat while not hungry')
+    } catch {
+        bot.chat('/effect give @s resistance 100 255')
+        bot.chat('/effect give @s regeneration 100 255')
+        bot.chat('/effect give @s hunger 10000 100')
+    }
 })

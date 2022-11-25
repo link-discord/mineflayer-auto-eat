@@ -43,6 +43,10 @@ function plugin(bot) {
         }
         const bestFood = bestChoices[0];
         const usedHand = offhand ? 'off-hand' : 'hand';
+        if (bot.food === 20 && !bestFood.name.includes('golden_apple')) {
+            bot.autoEat.isEating = false;
+            throw new Error('Food is already full.');
+        }
         bot.emit('autoeat_started', bestFood, offhand);
         const requiresConfirmation = bot.inventory.requiresConfirmation;
         if (bot.autoEat.options.ignoreInventoryCheck)
