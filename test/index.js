@@ -1,5 +1,5 @@
 const mineflayer = require('mineflayer')
-const autoEat = require('../dist/index.js').default
+const autoEat = require('../dist/index.js').plugin
 const ms = require('ms')
 const start = Date.now()
 
