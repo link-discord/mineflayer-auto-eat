@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const sleep = (ms = 0) => new Promise((resolve) => setTimeout(resolve, ms));
+exports.plugin = void 0;
+const promises_1 = require("timers/promises");
 function plugin(bot) {
     // @ts-ignore - Initializations
     bot.autoEat = {};
@@ -58,7 +59,7 @@ function plugin(bot) {
         while (bot.autoEat.isEating &&
             performance.now() - time < bot.autoEat.options.eatingTimeout &&
             bot.inventory.slots[bot.getEquipmentDestSlot(usedHand)]?.name === bestFood.name) {
-            await sleep();
+            await (0, promises_1.setTimeout)();
         }
         if (bot.autoEat.options.equipOldItem && oldItem && oldItem.name !== bestFood.name) {
             await bot.equip(oldItem, usedHand);
@@ -98,4 +99,4 @@ function plugin(bot) {
         }
     });
 }
-exports.default = plugin;
+exports.plugin = plugin;

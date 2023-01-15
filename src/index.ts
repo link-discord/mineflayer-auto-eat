@@ -1,6 +1,7 @@
 import mineflayer from 'mineflayer'
 import mcData from 'minecraft-data'
 import { Item } from 'prismarine-item'
+import { setTimeout as sleep } from 'timers/promises'
 
 interface Options {
     priority: 'saturation' | 'foodPoints'
@@ -33,9 +34,7 @@ declare module 'mineflayer' {
     }
 }
 
-const sleep = (ms = 0) => new Promise<void>((resolve) => setTimeout(resolve, ms))
-
-export default function plugin(bot: mineflayer.Bot) {
+export function plugin(bot: mineflayer.Bot) {
     // @ts-ignore - Initializations
     bot.autoEat = {}
 

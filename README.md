@@ -46,7 +46,7 @@ npm install mineflayer-auto-eat
 
 ```js
 const mineflayer = require('mineflayer')
-const autoeat = require('mineflayer-auto-eat').default
+const autoeat = require('mineflayer-auto-eat').plugin
 
 const bot = mineflayer.createBot({
     host: process.argv[2],

@@ -29,5 +29,5 @@ declare module 'mineflayer' {
         autoeat_error: (error?: Error) => void;
     }
 }
-export default function plugin(bot: mineflayer.Bot): void;
+export declare function plugin(bot: mineflayer.Bot): void;
 export {};
