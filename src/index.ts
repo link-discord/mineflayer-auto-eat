@@ -48,7 +48,7 @@ export function plugin(bot: mineflayer.Bot) {
         bannedFood: ['pufferfish', 'spider_eye', 'poisonous_potato', 'rotten_flesh'],
         ignoreInventoryCheck: false,
         checkOnItemPickup: true,
-        offhand: false,
+        offhand: true,
         equipOldItem: true
     }
 
