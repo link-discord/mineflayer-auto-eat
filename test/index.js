@@ -21,7 +21,8 @@ function display(passed, message) {
     console.clear()
 
     const usingOffhand = bot.autoEat.options.useOffhand
-    const currentItem = bot.inventory.slots[bot.getEquipmentDestSlot(usingOffhand ? 'off-hand' : 'hand')]
+    const currentItem =
+        bot.inventory.slots[bot.getEquipmentDestSlot(usingOffhand ? 'off-hand' : 'hand')]
 
     log(`🍖 Item: ${currentItem ? currentItem.name : 'empty'}`)
     log(`🍗 Food: ${bot.food}`)
@@ -69,13 +70,12 @@ bot.on('autoeat_finished', async (item, offhand) => {
 bot.on('health', () => {
     display()
 
-    if (bot.food < 10) {
-        display(false, 'Food went below 10')
-    }
+    if (bot.food < 10) display(false, 'Food went below 10')
 })
 
 bot.once('spawn', async () => {
     bot.autoEat.options.priority = 'saturation'
+    bot.autoEat.options.startAt = 14
 
     bot.chat('/clear')
     bot.chat('/effect clear @s')
@@ -89,7 +89,7 @@ bot.once('spawn', async () => {
     await bot.waitForTicks(20)
 
     const successful = await bot.autoEat.eat()
-    
+
     if (successful) display(false, 'Eat function tried to eat while not hungry')
 
     bot.chat('/effect give @s resistance 100 255')

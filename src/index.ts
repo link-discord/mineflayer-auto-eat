@@ -43,7 +43,7 @@ export function plugin(bot: mineflayer.Bot) {
 
     bot.autoEat.options = {
         priority: 'foodPoints',
-        startAt: 14,
+        startAt: 16,
         eatingTimeout: 3000,
         bannedFood: ['pufferfish', 'spider_eye', 'poisonous_potato', 'rotten_flesh'],
         ignoreInventoryCheck: false,
