@@ -45,7 +45,26 @@ export function plugin(bot: mineflayer.Bot) {
         priority: 'saturation',
         startAt: 16,
         eatingTimeout: 3000,
-        bannedFood: ['pufferfish', 'spider_eye', 'poisonous_potato', 'rotten_flesh'],
+        bannedFood: [
+            // puffer fish - only gives negative effects
+            'pufferfish',
+            // spider eye - gives poison effect
+            'spider_eye',
+            // poisonous potato - gives poison effect
+            'poisonous_potato',
+            // rotten flesh - gives hunger effect
+            'rotten_flesh',
+            // chorus fruit - randomly teleports you
+            'chorus_fruit',
+            // raw chicken - 30% chance of getting hunger effect
+            'raw_chicken',
+            // suspicious stew - gives random effects (including hunger)
+            'suspicious_stew',
+            // enchanted golden apple - shouldn't be eaten unless the user wants to
+            'enchanted_golden_apple',
+            // golden apple - shouldn't be eaten unless the user wants to
+            'golden_apple'
+        ],
         ignoreInventoryCheck: false,
         checkOnItemPickup: true,
         offhand: true,
@@ -61,7 +80,13 @@ export function plugin(bot: mineflayer.Bot) {
     }
 
     bot.autoEat.eat = async (useOffhand = bot.autoEat.options.offhand) => {
-        if (bot.autoEat.isEating || bot.autoEat.disabled || bot.food > bot.autoEat.options.startAt || bot.food > 19) return false
+        if (
+            bot.autoEat.isEating ||
+            bot.autoEat.disabled ||
+            bot.food > bot.autoEat.options.startAt ||
+            bot.food > 19
+        )
+            return false
         bot.autoEat.isEating = true
 
         const canOffhand = !bot.supportFeature('doesntHaveOffHandSlot')
@@ -150,7 +175,11 @@ export function plugin(bot: mineflayer.Bot) {
     })
 
     bot._client.on('entity_status', (packet: any) => {
-        if (packet.entityId === bot.entity.id && packet.entityStatus === 9 && bot.autoEat.isEating) {
+        if (
+            packet.entityId === bot.entity.id &&
+            packet.entityStatus === 9 &&
+            bot.autoEat.isEating
+        ) {
             bot.autoEat.isEating = false
         }
     })
