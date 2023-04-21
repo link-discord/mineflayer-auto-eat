@@ -1,29 +1,28 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
-- [mineflayer-auto-eat](#mineflayer-auto-eat)
-  - [Install](#install)
-  - [Example](#example)
-  - [API](#api)
-    - [Properties](#properties)
-      - [bot.autoEat.disabled](#botautoeatdisabled)
-      - [bot.autoEat.isEating](#botautoeatiseating)
-      - [bot.autoEat.options](#botautoeatoptions)
-      - [bot.autoEat.options.priority](#botautoeatoptionspriority)
-      - [bot.autoEat.options.startAt](#botautoeatoptionsstartat)
-      - [bot.autoEat.options.bannedFood](#botautoeatoptionsbannedfood)
-      - [bot.autoEat.options.ignoreInventoryCheck](#botautoeatoptionsignoreinventorycheck)
-      - [bot.autoEat.options.checkOnItemPickup](#botautoeatoptionscheckonitempickup)
-      - [bot.autoEat.options.eatingTimeout](#botautoeatoptionseatingtimeout)
-      - [bot.autoEat.options.useOffhand](#botautoeatoptionsuseoffhand)
-      - [bot.autoEat.options.equipOldItem](#botautoeatoptionsequipolditem)
-    - [Methods](#methods)
-      - [bot.autoEat.enable()](#botautoeatenable)
-      - [bot.autoEat.disable()](#botautoeatdisable)
-      - [bot.autoEat.eat()](#botautoeateat)
-  - [Author](#author)
-  - [Show your support](#show-your-support)
+-   [mineflayer-auto-eat](#mineflayer-auto-eat)
+    -   [Install](#install)
+    -   [Example](#example)
+    -   [API](#api)
+        -   [Properties](#properties)
+            -   [bot.autoEat.disabled](#botautoeatdisabled)
+            -   [bot.autoEat.isEating](#botautoeatiseating)
+            -   [bot.autoEat.options](#botautoeatoptions)
+            -   [bot.autoEat.options.priority](#botautoeatoptionspriority)
+            -   [bot.autoEat.options.startAt](#botautoeatoptionsstartat)
+            -   [bot.autoEat.options.bannedFood](#botautoeatoptionsbannedfood)
+            -   [bot.autoEat.options.ignoreInventoryCheck](#botautoeatoptionsignoreinventorycheck)
+            -   [bot.autoEat.options.checkOnItemPickup](#botautoeatoptionscheckonitempickup)
+            -   [bot.autoEat.options.eatingTimeout](#botautoeatoptionseatingtimeout)
+            -   [bot.autoEat.options.useOffhand](#botautoeatoptionsuseoffhand)
+            -   [bot.autoEat.options.equipOldItem](#botautoeatoptionsequipolditem)
+        -   [Methods](#methods)
+            -   [bot.autoEat.enable()](#botautoeatenable)
+            -   [bot.autoEat.disable()](#botautoeatdisable)
+            -   [bot.autoEat.eat()](#botautoeateat)
+    -   [Author](#author)
+    -   [Show your support](#show-your-support)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -102,19 +101,19 @@ bot.once('spawn', () => {
 
 Acceptable Values are "saturation" or "foodPoints"
 
-default: "foodPoints"
+default: "saturation"
 
 #### bot.autoEat.options.startAt
 
 If the bot has less or equal food points than this value, the bot will start eating
 
-default: 14
+default: 16
 
 #### bot.autoEat.options.bannedFood
 
 The bot will not eat the items in the array.
 
-default: ['pufferfish', 'spider_eye', 'poisonous_potato', 'rotten_flesh']
+default: pufferfish, spider_eye, poisonous_potato, rotten_flesh, chorus_fruit, chicken, suspicious_stew, enchanted_golden_apple, golden_apple
 
 #### bot.autoEat.options.ignoreInventoryCheck
 
@@ -132,16 +131,16 @@ default: true
 #### bot.autoEat.options.eatingTimeout
 
 Timeout of food consumption. If eating takes too long, we're assuming that
-it is finished after that time. Time in seconds, null or negative value means
+it is finished after that time. Time in milliseconds, null or negative value means
 "no timeout".
 
-default: 3
+default: 3000
 
 #### bot.autoEat.options.useOffhand
 
 If true, the bot will use the offhand slot to eat food.
 
-default: false
+default: true
 
 #### bot.autoEat.options.equipOldItem
 

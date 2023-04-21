@@ -57,7 +57,7 @@ export function plugin(bot: mineflayer.Bot) {
             // chorus fruit - randomly teleports you
             'chorus_fruit',
             // raw chicken - 30% chance of getting hunger effect
-            'raw_chicken',
+            'chicken',
             // suspicious stew - gives random effects (including hunger)
             'suspicious_stew',
             // enchanted golden apple - shouldn't be eaten unless the user wants to
