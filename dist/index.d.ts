@@ -1,4 +1,4 @@
-import mineflayer from 'mineflayer';
+import { Bot } from 'mineflayer';
 import { Item } from 'prismarine-item';
 interface Options {
     priority: 'saturation' | 'foodPoints';
@@ -24,8 +24,8 @@ declare module 'mineflayer' {
     interface BotEvents {
         autoeat_started: (eatenItem: Item, usedOffhand: boolean) => void;
         autoeat_finished: (eatenItem: Item, usedOffhand: boolean) => void;
-        autoeat_error: (error?: Error) => void;
+        autoeat_error: (error: Error) => void;
     }
 }
-export declare function plugin(bot: mineflayer.Bot): void;
+export declare function plugin(bot: Bot): void;
 export {};
