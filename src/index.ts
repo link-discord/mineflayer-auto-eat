@@ -1,5 +1,4 @@
-import mineflayer from 'mineflayer'
-import mcData from 'minecraft-data'
+import { Bot, EquipmentDestination } from 'mineflayer'
 import { Item } from 'prismarine-item'
 import { setTimeout as sleep } from 'timers/promises'
 
@@ -29,11 +28,11 @@ declare module 'mineflayer' {
     interface BotEvents {
         autoeat_started: (eatenItem: Item, usedOffhand: boolean) => void
         autoeat_finished: (eatenItem: Item, usedOffhand: boolean) => void
-        autoeat_error: (error?: Error) => void
+        autoeat_error: (error: Error) => void
     }
 }
 
-export function plugin(bot: mineflayer.Bot) {
+export function plugin(bot: Bot) {
     // @ts-ignore - Initializations
     bot.autoEat = {}
 
@@ -109,7 +108,7 @@ export function plugin(bot: mineflayer.Bot) {
         }
 
         const bestFood = bestChoices[0]
-        const usedHand: mineflayer.EquipmentDestination = offhand ? 'off-hand' : 'hand'
+        const usedHand: EquipmentDestination = offhand ? 'off-hand' : 'hand'
 
         bot.emit('autoeat_started', bestFood, offhand)
 
