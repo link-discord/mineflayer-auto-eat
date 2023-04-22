@@ -1,5 +1,4 @@
 import mineflayer from 'mineflayer';
-import mcData from 'minecraft-data';
 import { Item } from 'prismarine-item';
 interface Options {
     priority: 'saturation' | 'foodPoints';
@@ -13,7 +12,6 @@ interface Options {
 }
 declare module 'mineflayer' {
     interface Bot {
-        registry: mcData.IndexedData;
         autoEat: {
             disabled: boolean;
             isEating: boolean;
