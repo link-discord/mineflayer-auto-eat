@@ -89,9 +89,9 @@ Example
 
 ```js
 bot.once('spawn', () => {
-    bot.autoEat.options.priority = 'saturation'
-    bot.autoEat.options.startAt = 16
-    bot.autoEat.options.bannedFood.push('golden_apple', 'enchanted_golden_apple')
+    bot.autoEat.options.priority = 'foodPoints'
+    bot.autoEat.options.startAt = 14
+    bot.autoEat.options.bannedFood.push('golden_apple')
 })
 ```
 
@@ -111,7 +111,7 @@ default: 16
 
 The bot will not eat the items in the array.
 
-default: pufferfish, spider_eye, poisonous_potato, rotten_flesh, chorus_fruit, chicken, suspicious_stew, enchanted_golden_apple, golden_apple
+default: pufferfish, spider_eye, poisonous_potato, rotten_flesh, chorus_fruit, chicken, suspicious_stew, golden_apple
 
 #### bot.autoEat.options.ignoreInventoryCheck
 

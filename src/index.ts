@@ -58,8 +58,6 @@ export function plugin(bot: Bot) {
             'chicken',
             // suspicious stew - gives random effects (including hunger)
             'suspicious_stew',
-            // enchanted golden apple - shouldn't be eaten unless the user wants to
-            'enchanted_golden_apple',
             // golden apple - shouldn't be eaten unless the user wants to
             'golden_apple'
         ],
