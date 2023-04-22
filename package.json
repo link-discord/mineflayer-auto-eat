@@ -24,10 +24,9 @@
         "url": "https://github.com/link-discord/mineflayer-auto-eat"
     },
     "devDependencies": {
-        "doctoc": "^2.2.1",
-        "minecraft-data": "^3.18.0",
-        "mineflayer": "^4.5.1",
+        "minecraft-data": "^3.31.0",
+        "mineflayer": "^4.8.1",
         "prismarine-item": "^1.12.1",
-        "typescript": "^5.0.2"
+        "typescript": "^5.0.4"
     }
 }
