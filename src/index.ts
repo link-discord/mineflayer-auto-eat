@@ -16,7 +16,6 @@ interface Options {
 
 declare module 'mineflayer' {
     interface Bot {
-        registry: mcData.IndexedData
         autoEat: {
             disabled: boolean
             isEating: boolean
