@@ -175,10 +175,11 @@ bot.autoEat
 
 ## Author
 
-👤 **Link#0069**
+👤 **Link**
 
 -   Github: [@link-discord](https://github.com/link-discord)
 -   Twitter: [@link0069](https://twitter.com/link0069)
+-   Discord: @link0069
 
 ## Show your support
 
