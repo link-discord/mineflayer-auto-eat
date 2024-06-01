@@ -11,6 +11,7 @@
             -   [bot.autoEat.options](#botautoeatoptions)
             -   [bot.autoEat.options.priority](#botautoeatoptionspriority)
             -   [bot.autoEat.options.startAt](#botautoeatoptionsstartat)
+            -   [bot.autoEat.options.healthThreshold](#botautoeatoptionshealththreshold)
             -   [bot.autoEat.options.bannedFood](#botautoeatoptionsbannedfood)
             -   [bot.autoEat.options.ignoreInventoryCheck](#botautoeatoptionsignoreinventorycheck)
             -   [bot.autoEat.options.checkOnItemPickup](#botautoeatoptionscheckonitempickup)
@@ -88,7 +89,7 @@ Example
 
 ```js
 bot.once('spawn', () => {
-    bot.autoEat.options.priority = 'foodPoints'
+    bot.autoEat.options.priority = 'auto'
     bot.autoEat.options.startAt = 14
     bot.autoEat.options.bannedFood.push('golden_apple')
 })
@@ -96,15 +97,20 @@ bot.once('spawn', () => {
 
 #### bot.autoEat.options.priority
 
-Acceptable Values are "saturation" or "foodPoints"
+Acceptable Values are "saturation", "foodPoints" or "auto"
 
-default: "saturation"
+default: "auto"
 
 #### bot.autoEat.options.startAt
 
 If the bot has less or equal food points than this value, the bot will start eating
 
 default: 16
+
+#### bot.autoEat.options.healthThreshold
+
+If the bot has less or equal health than this value and the bots priority is set to "auto",
+the bot will prioritize eating food with the highest saturation value and it will temporarily set startAt to 19
 
 #### bot.autoEat.options.bannedFood
 
