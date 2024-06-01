@@ -2,8 +2,9 @@
     "compilerOptions": {
         "declaration": true,
         "esModuleInterop": true,
-        "lib": ["ES2022"],
-        "module": "commonjs",
+        "lib": ["ES2023"],
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
         "outDir": "./dist",
         "skipLibCheck": true,
         "strict": true,

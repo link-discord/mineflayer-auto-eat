@@ -3,9 +3,10 @@ import { Item } from 'prismarine-item'
 import { setTimeout as sleep } from 'timers/promises'
 
 interface Options {
-    priority: 'saturation' | 'foodPoints'
+    priority: 'saturation' | 'foodPoints' | 'auto'
     startAt: number
-    bannedFood: string[]
+    healthThreshold: number
+    bannedFood: number[]
     eatingTimeout: number
     ignoreInventoryCheck: boolean
     checkOnItemPickup: boolean
@@ -35,31 +36,30 @@ declare module 'mineflayer' {
 export function plugin(bot: Bot) {
     // @ts-ignore - Initializations
     bot.autoEat = {}
-
     bot.autoEat.disabled = false
     bot.autoEat.isEating = false
-
     bot.autoEat.options = {
-        priority: 'saturation',
+        priority: 'auto',
         startAt: 16,
+        healthThreshold: 14,
         eatingTimeout: 3000,
         bannedFood: [
             // puffer fish - only gives negative effects
-            'pufferfish',
+            bot.registry.foodsByName['pufferfish'].id,
             // spider eye - gives poison effect
-            'spider_eye',
+            bot.registry.foodsByName['spider_eye'].id,
             // poisonous potato - gives poison effect
-            'poisonous_potato',
-            // rotten flesh - gives hunger effect
-            'rotten_flesh',
+            bot.registry.foodsByName['poisonous_potato'].id,
+            // rotten flesh - gives hunger effect (and is disgusting)
+            bot.registry.foodsByName['rotten_flesh'].id,
             // chorus fruit - randomly teleports you
-            'chorus_fruit',
+            bot.registry.foodsByName['chorus_fruit'].id,
             // raw chicken - 30% chance of getting hunger effect
-            'chicken',
+            bot.registry.foodsByName['chicken'].id,
             // suspicious stew - gives random effects (including hunger)
-            'suspicious_stew',
+            bot.registry.foodsByName['suspicious_stew'].id,
             // golden apple - shouldn't be eaten unless the user wants to
-            'golden_apple'
+            bot.registry.foodsByName['golden_apple'].id
         ],
         ignoreInventoryCheck: false,
         checkOnItemPickup: true,
@@ -76,13 +76,19 @@ export function plugin(bot: Bot) {
     }
 
     bot.autoEat.eat = async (useOffhand = bot.autoEat.options.offhand) => {
+        if (bot.autoEat.disabled || bot.autoEat.isEating || bot.food > 19) return false
+
+        let startAt = bot.autoEat.options.startAt
+
         if (
-            bot.autoEat.isEating ||
-            bot.autoEat.disabled ||
-            bot.food > bot.autoEat.options.startAt ||
-            bot.food > 19
-        )
-            return false
+            bot.autoEat.options.priority === 'auto' &&
+            bot.health <= bot.autoEat.options.healthThreshold
+        ) {
+            startAt = 19
+        }
+
+        if (bot.food > startAt) return false
+
         bot.autoEat.isEating = true
 
         const canOffhand = !bot.supportFeature('doesntHaveOffHandSlot')
@@ -97,16 +103,43 @@ export function plugin(bot: Bot) {
 
         const bestChoices = items
             .filter((item) => item.name in bot.registry.foodsByName)
-            .filter((item) => !banned.includes(item.name))
-            .sort((a, b) => food[b.name][priority] - food[a.name][priority])
+            .filter((item) => !banned.includes(item.type))
+            .sort((a, b) => {
+                if (priority !== 'auto') return food[b.name][priority] - food[a.name][priority]
+
+                if (bot.health <= bot.autoEat.options.healthThreshold) {
+                    return food[b.name].saturation - food[a.name].saturation
+                } else {
+                    return food[b.name].foodPoints - food[a.name].foodPoints
+                }
+            })
 
         if (bestChoices.length === 0) {
             bot.autoEat.isEating = false
-            throw new Error('No food found.')
+            bot.emit('autoeat_error', new Error('No food found'))
+            return false
         }
 
-        const bestFood = bestChoices[0]
+        let bestFood = bestChoices[0]
         const usedHand: EquipmentDestination = offhand ? 'off-hand' : 'hand'
+
+        // Find the food that has the closest amount of points needed to be full
+        // This is to prevent wasting food
+        if (
+            priority === 'foodPoints' ||
+            (priority === 'auto' && bot.health > bot.autoEat.options.healthThreshold)
+        ) {
+            const neededPoints = 20 - bot.food
+            const bestFoodPoints = food[bestFood.name].foodPoints
+
+            for (const item of bestChoices) {
+                const points = food[item.name].foodPoints
+
+                if (Math.abs(points - neededPoints) < Math.abs(bestFoodPoints - neededPoints)) {
+                    bestFood = item
+                }
+            }
+        }
 
         bot.emit('autoeat_started', bestFood, offhand)
 
