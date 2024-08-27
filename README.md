@@ -47,7 +47,7 @@ npm install mineflayer-auto-eat
 import { createBot } from 'mineflayer'
 import { plugin as autoeat } from 'mineflayer-auto-eat'
 
-const bot = mineflayer.createBot({
+const bot = createBot({
     host: process.argv[2],
     port: process.argv[3],
     username: process.argv[4],
