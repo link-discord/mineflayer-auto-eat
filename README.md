@@ -179,14 +179,17 @@ bot.autoEat
     })
 ```
 
-## Author
+## Authors
 
 👤 **Link**
-
--   Github: [@link-discord](https://github.com/link-discord)
+-   Github: [link-discord](https://github.com/link-discord)
 -   Twitter: [@link0069](https://twitter.com/link0069)
 -   Discord: @link0069
 
 ## Show your support
 
 Give a ⭐️ if this plugin helped you!
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=link-discord/mineflayer-auto-eat&type=Date)](https://star-history.com/#link-discord/mineflayer-auto-eat&Date)
