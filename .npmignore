@@ -1,5 +1,6 @@
 test
 src
 .github
+.vscode
 package-lock.json
 tsconfig.json
