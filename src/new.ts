@@ -160,7 +160,7 @@ export class EatUtil extends (EventEmitter as {new(): StrictEventEmitter<EventEm
    * @returns 
    */
   private buildEatingListener(relevantItem: Item, timeout: number) {
-    return new Promise((res: (any: void) => void, rej) => {
+    return new Promise<void>((res, rej) => {
       const eatingListener = (packet: any) => {
         if (packet.entityId === this.bot.entity.id && packet.entityStatus === 9) {
           this.bot._client.off('entity_status', eatingListener);
