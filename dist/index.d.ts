@@ -1,5 +1,5 @@
 import { Bot } from "mineflayer";
-import { EatUtil } from "./new";
+import { EatUtil } from "./new.js";
 declare module "mineflayer" {
     interface Bot {
         autoEat: EatUtil;

@@ -1,8 +1,6 @@
 import { Bot } from "mineflayer";
-import * as utilPluginDefault from "@nxg-org/mineflayer-util-plugin";
 import { EatUtil } from "./new.js";
-
-const utilPlugin = utilPluginDefault.inject
+import utilPlugin from "@nxg-org/mineflayer-util-plugin";
 
 declare module "mineflayer" {
     interface Bot {
@@ -11,6 +9,6 @@ declare module "mineflayer" {
 }
 
 export function loader(bot: Bot) {
-    if (!bot.hasPlugin(utilPlugin)) bot.loadPlugin(utilPlugin)
+    if (!bot.hasPlugin(utilPlugin.default)) bot.loadPlugin(utilPlugin.default)
     bot.autoEat = new EatUtil(bot);
 }
