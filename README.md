@@ -52,25 +52,25 @@ const bot = createBot({
     host: process.argv[2],
     port: process.argv[3],
     username: process.argv[4],
-    password: process.argv[5]
+    auth: process.argv[5]
 })
 
-
-bot.once('spawn', () => {
+bot.once('spawn', async () => {
     bot.loadPlugin(autoEat)
+
     bot.autoEat.enableAuto()
-})
 
-bot.autoEat.on('eatStart', (opts) => {
-    console.log(`Started eating ${opts.food.name} in ${opts.offhand ? 'offhand' : 'hand'}`)
-})
+    bot.autoEat.on('eatStart', (opts) => {
+        console.log(`Started eating ${opts.food.name} in ${opts.offhand ? 'offhand' : 'hand'}`)
+    })
 
-bot.autoEat.on('eatFinish', (opts) => {
-    console.log(`Finished eating ${opts.food.name}`)
-})
+    bot.autoEat.on('eatFinish', (opts) => {
+        console.log(`Finished eating ${opts.food.name}`)
+    })
 
-bot.autoEat.on('eatFail', (error) => {
-    console.error('Eating failed:', error)
+    bot.autoEat.on('eatFail', (error) => {
+        console.error('Eating failed:', error)
+    })
 })
 ```
 

@@ -1,7 +1,7 @@
+import type { Item } from 'prismarine-item'
 import { EventEmitter } from 'events'
 import { Bot } from 'mineflayer'
 import { Food as MdFood } from 'minecraft-data'
-import { Item } from 'prismarine-item'
 import { StrictEventEmitter } from 'strict-event-emitter-types'
 
 type FoodSelection = MdFood | Item | number | string
@@ -87,7 +87,7 @@ export class EatUtil extends (EventEmitter as {
 
     public cancelEat() {
         if (this._rejectionBinding == null) return
-        
+
         this._rejectionBinding(new Error('Eating manually canceled!'))
         this.bot.deactivateItem()
     }
@@ -113,12 +113,12 @@ export class EatUtil extends (EventEmitter as {
     private normalizeFoodChoice(sel?: FoodSelection): Item | undefined {
         if (sel == null) {
             return undefined
-        } else if (sel instanceof String) {
+        } else if (typeof sel === 'string') {
             return this.bot.util.inv.getAllItems().find((i) => i.name === sel)
-        } else if (sel instanceof Number) {
+        } else if (typeof sel === 'number') {
             return this.bot.util.inv.getAllItems().find((i) => i.type === sel)
-        } else if (sel instanceof Item) {
-            return sel
+        } else if (typeof sel === 'object' && 'name' in sel && 'type' in sel) {
+            return sel as Item
         }
 
         const fsel = sel as MdFood
