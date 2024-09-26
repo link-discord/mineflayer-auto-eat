@@ -1,7 +1,7 @@
 
 ---
 
-<h1 align="center">mineflayer-auto-eat-util</h1>
+<h1 align="center">mineflayer-auto-eat</h1>
 
 ![npm](https://img.shields.io/npm/v/mineflayer-auto-eat)
 ![npm bundle size](https://img.shields.io/bundlephobia/min/mineflayer-auto-eat)
@@ -39,14 +39,14 @@
 ## Install
 
 ```sh
-npm install mineflayer-auto-eat-util
+npm install mineflayer-auto-eat
 ```
 
 ## Example
 
 ```js
 import { createBot } from 'mineflayer'
-import { loader as autoEat } from 'mineflayer-auto-eat-util'
+import { loader as autoEat } from 'mineflayer-auto-eat'
 
 const bot = createBot({
     host: process.argv[2],
