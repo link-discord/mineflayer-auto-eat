@@ -235,5 +235,3 @@ bot.autoEat.on('eatFail', (error) => {
 ## Show your support
 
 Give a ⭐️ if this plugin helped you!
-
----
