@@ -49,15 +49,14 @@ import { createBot } from 'mineflayer'
 import { loader as autoEat } from 'mineflayer-auto-eat'
 
 const bot = createBot({
-    host: process.argv[2],
-    port: process.argv[3],
-    username: process.argv[4],
-    auth: process.argv[5]
+    host: process.argv[2] || 'localhost',
+    port: process.argv[3] || 25565,
+    username: process.argv[4] || 'bot',
+    auth: process.argv[5] || 'microsoft',
 })
 
 bot.once('spawn', async () => {
     bot.loadPlugin(autoEat)
-
     bot.autoEat.enableAuto()
 
     bot.autoEat.on('eatStart', (opts) => {
@@ -73,6 +72,7 @@ bot.once('spawn', async () => {
     })
 })
 ```
+Run this with `node <file>.js [host] [port] [username] [auth]`.
 
 ## API
 
@@ -227,12 +227,13 @@ bot.autoEat.on('eatFail', (error) => {
 ## Authors
 
 👤 **Rocco A**
--   Github: [GenerelSchwerz](https://github.com/GenerelSchwerz)
+-   Github: https://github.com/GenerelSchwerz
 
 👤 **Link**
--   Github: [link-discord](https://github.com/link-discord)
--   Twitter: [@link0069](https://twitter.com/link0069)
--   Discord: @link0069
+-   Github: https://github.com/link-discord
+-   Twitter: https://twitter.com/link0069
+-   Website: https://linkdiscord.xyz/
+-   Discord: @link0069 
 
 ## Show your support
 
