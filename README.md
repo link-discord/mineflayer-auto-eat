@@ -1,31 +1,5 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
--   [mineflayer-auto-eat](#mineflayer-auto-eat)
-    -   [Install](#install)
-    -   [Example](#example)
-    -   [API](#api)
-        -   [Properties](#properties)
-            -   [bot.autoEat.disabled](#botautoeatdisabled)
-            -   [bot.autoEat.isEating](#botautoeatiseating)
-            -   [bot.autoEat.options](#botautoeatoptions)
-            -   [bot.autoEat.options.priority](#botautoeatoptionspriority)
-            -   [bot.autoEat.options.startAt](#botautoeatoptionsstartat)
-            -   [bot.autoEat.options.healthThreshold](#botautoeatoptionshealththreshold)
-            -   [bot.autoEat.options.bannedFood](#botautoeatoptionsbannedfood)
-            -   [bot.autoEat.options.ignoreInventoryCheck](#botautoeatoptionsignoreinventorycheck)
-            -   [bot.autoEat.options.checkOnItemPickup](#botautoeatoptionscheckonitempickup)
-            -   [bot.autoEat.options.eatingTimeout](#botautoeatoptionseatingtimeout)
-            -   [bot.autoEat.options.useOffhand](#botautoeatoptionsuseoffhand)
-            -   [bot.autoEat.options.equipOldItem](#botautoeatoptionsequipolditem)
-        -   [Methods](#methods)
-            -   [bot.autoEat.enable()](#botautoeatenable)
-            -   [bot.autoEat.disable()](#botautoeatdisable)
-            -   [bot.autoEat.eat()](#botautoeateat)
-    -   [Author](#author)
-    -   [Show your support](#show-your-support)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+---
 
 <h1 align="center">mineflayer-auto-eat</h1>
 
@@ -33,7 +7,34 @@
 ![npm bundle size](https://img.shields.io/bundlephobia/min/mineflayer-auto-eat)
 ![GitHub](https://img.shields.io/github/license/link-discord/mineflayer-auto-eat?color=red)
 
-> Auto eat plugin for mineflayer
+> A customizable and flexible auto-eat utility plugin for Mineflayer bots
+
+## Table of Contents
+
+
+- [Table of Contents](#table-of-contents)
+- [Install](#install)
+- [Example](#example)
+- [API](#api)
+  - [Properties](#properties)
+    - [bot.autoEat.enabled](#botautoeatenabled)
+    - [bot.autoEat.isEating](#botautoeatiseating)
+    - [bot.autoEat.opts](#botautoeatopts)
+    - [bot.autoEat.foods](#botautoeatfoods)
+    - [bot.autoEat.foodsArray](#botautoeatfoodsarray)
+    - [bot.autoEat.foodsByName](#botautoeatfoodsbyname)
+  - [Methods](#methods)
+    - [bot.autoEat.setOpts(opts: Partial\<IEatUtilOpts\>)](#botautoeatsetoptsopts-partialieatutilopts)
+    - [bot.autoEat.eat(opts: EatOptions)](#botautoeateatopts-eatoptions)
+    - [bot.autoEat.enableAuto()](#botautoeatenableauto)
+    - [bot.autoEat.disableAuto()](#botautoeatdisableauto)
+    - [bot.autoEat.cancelEat()](#botautoeatcanceleat)
+  - [Settings](#settings)
+    - [IEatUtilOpts](#ieatutilopts)
+    - [EatOpts](#eatopts)
+  - [Events](#events)
+- [Authors](#authors)
+- [Show your support](#show-your-support)
 
 ## Install
 
@@ -45,151 +46,197 @@ npm install mineflayer-auto-eat
 
 ```js
 import { createBot } from 'mineflayer'
-import { plugin as autoeat } from 'mineflayer-auto-eat'
+import { loader as autoEat } from 'mineflayer-auto-eat'
 
 const bot = createBot({
-    host: process.argv[2],
-    port: process.argv[3],
-    username: process.argv[4],
-    password: process.argv[5]
+    host: process.argv[2] || 'localhost',
+    port: process.argv[3] || 25565,
+    username: process.argv[4] || 'bot',
+    auth: process.argv[5] || 'microsoft',
 })
 
-bot.loadPlugin(autoeat)
+bot.once('spawn', async () => {
+    bot.loadPlugin(autoEat)
+    bot.autoEat.enableAuto()
 
-bot.on('autoeat_started', (item, offhand) => {
-    console.log(`Eating ${item.name} in ${offhand ? 'offhand' : 'hand'}`)
+    bot.autoEat.on('eatStart', (opts) => {
+        console.log(`Started eating ${opts.food.name} in ${opts.offhand ? 'offhand' : 'hand'}`)
+    })
+
+    bot.autoEat.on('eatFinish', (opts) => {
+        console.log(`Finished eating ${opts.food.name}`)
+    })
+
+    bot.autoEat.on('eatFail', (error) => {
+        console.error('Eating failed:', error)
+    })
 })
-
-bot.on('autoeat_finished', (item, offhand) => {
-    console.log(`Finished eating ${item.name} in ${offhand ? 'offhand' : 'hand'}`)
-})
-
-bot.on('autoeat_error', console.error)
 ```
+Run this with `node <file>.js [host] [port] [username] [auth]`.
 
 ## API
 
 ### Properties
 
-#### bot.autoEat.disabled
+#### bot.autoEat.enabled
 
-Boolean value indicating whether auto eat is disabled or not.
+Boolean value indicating whether the auto-eat utility is enabled or disabled.
 
 #### bot.autoEat.isEating
 
-Boolean value indicating whether the bot is currently eating or not.
-This value should never be set manually.
+Boolean value indicating whether the bot is currently eating or not. This value should not be manually set.
 
-#### bot.autoEat.options
+#### bot.autoEat.opts
 
-Can be changed to change the settings for the auto eat plugin
-(Should only be changed when the bot has spawned)
-
-Example
+This object holds the configurable options for the auto-eat utility.
 
 ```js
-bot.once('spawn', () => {
-    bot.autoEat.options.priority = 'auto'
-    bot.autoEat.options.startAt = 14
-    bot.autoEat.options.bannedFood.push('golden_apple')
-})
+{
+  priority: "foodPoints",
+  minHunger: 15,
+  minHealth: 14,
+  returnToLastItem: true,
+  offhand: false,
+  eatingTimeout: 3000,
+  bannedFood: ["rotten_flesh", "pufferfish", "chorus_fruit", "poisonous_potato", "spider_eye"],
+  strictErrors: true
+}
 ```
 
-#### bot.autoEat.options.priority
+#### bot.autoEat.foods
 
-Acceptable Values are "saturation", "foodPoints" or "auto"
+Returns the `foods` registry from the bot, which contains all food-related information from the Minecraft data.
 
-default: "auto"
+#### bot.autoEat.foodsArray
 
-#### bot.autoEat.options.startAt
+Returns an array of all available foods in Minecraft from the bot's registry.
 
-If the bot has less or equal food points than this value, the bot will start eating
+#### bot.autoEat.foodsByName
 
-default: 16
-
-#### bot.autoEat.options.healthThreshold
-
-If the bot has less or equal health than this value and the bots priority is set to "auto",
-the bot will prioritize eating food with the highest saturation value and it will temporarily set startAt to 19
-
-#### bot.autoEat.options.bannedFood
-
-The bot will not eat the items in the array.
-
-default: pufferfish, spider_eye, poisonous_potato, rotten_flesh, chorus_fruit, chicken, suspicious_stew, golden_apple
-
-#### bot.autoEat.options.ignoreInventoryCheck
-
-Forces bot to disable inventory window click confirmation.
-Related to [PrismarineJS/mineflayer#2030](https://github.com/PrismarineJS/mineflayer/issues/2030)
-
-default: false
-
-#### bot.autoEat.options.checkOnItemPickup
-
-Attempts to eat food when the bot picks up an item and the bot reached the startAt threshold.
-
-default: true
-
-#### bot.autoEat.options.eatingTimeout
-
-Timeout of food consumption. If eating takes too long, we're assuming that
-it is finished after that time. Time in milliseconds, null or negative value means
-"no timeout".
-
-default: 3000
-
-#### bot.autoEat.options.useOffhand
-
-If true, the bot will use the offhand slot to eat food.
-
-default: true
-
-#### bot.autoEat.options.equipOldItem
-
-If true, the bot will equip the previous item after eating.
-
-default: true
+Returns an object mapping food item names to their properties (e.g., saturation, foodPoints).
 
 ### Methods
 
-#### bot.autoEat.enable()
+#### bot.autoEat.setOpts(opts: Partial\<IEatUtilOpts\>)
 
-Calling this function will enable the plugin
-(its enabled by default ofc)
-
-#### bot.autoEat.disable()
-
-Calling this function will disable the plugin
-
-#### bot.autoEat.eat()
-
-If you want to call the eat function manually
-you can do it like this below
+Allows you to modify the configuration options for the auto-eat utility dynamically.
 
 ```js
-bot.autoEat
-    // Setting to true will use offhand slot
-    .eat(true)
-    .then((successful) => {
-        console.log('Finished executing eating function', successful)
-    })
-    .catch((error) => {
-        console.error(error)
-    })
+bot.autoEat.setOpts({
+  minHunger: 10,
+  priority: "saturation"
+});
+```
+
+#### bot.autoEat.eat(opts: EatOptions)
+
+Manually triggers the eating function. If options are not provided, it will automatically pick the best food based on the current options.
+
+```js
+bot.autoEat.eat({
+    food: 'apple', // optional
+    offhand: true, // optional
+    equipOldItem: false, // optional
+    priority: 'saturation' // optional
+}).then(() => {
+    console.log('Successfully ate the food!');
+}).catch((err) => {
+    console.error('Failed to eat:', err);
+});
+```
+
+#### bot.autoEat.enableAuto()
+
+Enables automatic eating based on the bot's hunger and health levels. The bot will automatically check if it needs to eat during each `physicsTick`.
+
+```js
+bot.autoEat.enableAuto();
+```
+
+#### bot.autoEat.disableAuto()
+
+Disables the automatic eating functionality.
+
+```js
+bot.autoEat.disableAuto();
+```
+
+#### bot.autoEat.cancelEat()
+
+Cancels the current eating action if the bot is in the process of eating.
+
+```js
+bot.autoEat.cancelEat();
+```
+
+### Settings
+
+#### IEatUtilOpts
+
+These options define how the `EatUtil` behaves:
+
+- **priority** (`FoodPriority`): Defines the priority for choosing food. Acceptable values are `"foodPoints"`, `"saturation"`, `"effectiveQuality"`, and `"saturationRatio"`. Default is `"foodPoints"`.
+- **minHunger** (`number`): If the bot's hunger is less than or equal to this value, the bot will attempt to eat. Default is `15`.
+- **minHealth** (`number`): If the bot's health is less than or equal to this value, the bot will prioritize eating food with higher saturation. Default is `14`.
+- **bannedFood** (`string[]`): An array of food names that the bot is not allowed to eat. Default includes `"rotten_flesh"`, `"pufferfish"`, `"chorus_fruit"`, `"poisonous_potato"`, `"spider_eye"`.
+- **returnToLastItem** (`boolean`): If `true`, the bot will re-equip the previous item after eating. Default is `true`.
+- **offhand** (`boolean`): If `true`, the bot will use the offhand to eat. Default is `false`.
+- **eatingTimeout** (`number`): The timeout (in milliseconds) for completing the eating action. Default is `3000`.
+- **strictErrors** (`boolean`): If `true`, errors during the eating process will be thrown. Otherwise, they will be logged to the console. Default is `true`.
+
+
+#### EatOpts
+
+These options are provided to the `eat` method to override default behavior.:
+
+- **food** (`FoodSelection`): The food item to eat. If not provided, the bot will automatically choose the best food based on the current options.
+- **offhand** (`boolean`): If `true`, the bot will use the offhand to eat. Default is `false`.
+- **equipOldItem** (`boolean`): If `true`, the bot will re-equip the previous item after eating. Default is `true`.
+- **priority** (`FoodPriority`): Defines the priority for choosing food. Acceptable values are `"foodPoints"`, `"saturation"`, `"effectiveQuality"`, and `"saturationRatio"`. Default is `"foodPoints"`.
+
+
+
+
+
+### Events
+
+- **eatStart**: Emitted when the bot starts eating an item.
+
+```js
+bot.autoEat.on('eatStart', (opts) => {
+  console.log(`Started eating ${opts.food.name}`);
+});
+```
+
+- **eatFinish**: Emitted when the bot finishes eating.
+
+```js
+bot.autoEat.on('eatFinish', (opts) => {
+  console.log(`Finished eating ${opts.food.name}`);
+});
+```
+
+- **eatFail**: Emitted when the bot fails to eat due to an error.
+
+```js
+bot.autoEat.on('eatFail', (error) => {
+  console.error('Eating failed:', error);
+});
 ```
 
 ## Authors
 
+👤 **Rocco A**
+-   Github: https://github.com/GenerelSchwerz
+
 👤 **Link**
--   Github: [link-discord](https://github.com/link-discord)
--   Twitter: [@link0069](https://twitter.com/link0069)
--   Discord: @link0069
+-   Github: https://github.com/link-discord
+-   Twitter: https://twitter.com/link0069
+-   Website: https://linkdiscord.xyz/
+-   Discord: @link0069 
 
 ## Show your support
 
 Give a ⭐️ if this plugin helped you!
 
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=link-discord/mineflayer-auto-eat&type=Date)](https://star-history.com/#link-discord/mineflayer-auto-eat&Date)
+---
