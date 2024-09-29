@@ -1,6 +1,3 @@
-
----
-
 <h1 align="center">mineflayer-auto-eat</h1>
 
 ![npm](https://img.shields.io/npm/v/mineflayer-auto-eat)
@@ -11,30 +8,29 @@
 
 ## Table of Contents
 
-
-- [Table of Contents](#table-of-contents)
-- [Install](#install)
-- [Example](#example)
-- [API](#api)
-  - [Properties](#properties)
-    - [bot.autoEat.enabled](#botautoeatenabled)
-    - [bot.autoEat.isEating](#botautoeatiseating)
-    - [bot.autoEat.opts](#botautoeatopts)
-    - [bot.autoEat.foods](#botautoeatfoods)
-    - [bot.autoEat.foodsArray](#botautoeatfoodsarray)
-    - [bot.autoEat.foodsByName](#botautoeatfoodsbyname)
-  - [Methods](#methods)
-    - [bot.autoEat.setOpts(opts: Partial\<IEatUtilOpts\>)](#botautoeatsetoptsopts-partialieatutilopts)
-    - [bot.autoEat.eat(opts: EatOptions)](#botautoeateatopts-eatoptions)
-    - [bot.autoEat.enableAuto()](#botautoeatenableauto)
-    - [bot.autoEat.disableAuto()](#botautoeatdisableauto)
-    - [bot.autoEat.cancelEat()](#botautoeatcanceleat)
-  - [Settings](#settings)
-    - [IEatUtilOpts](#ieatutilopts)
-    - [EatOpts](#eatopts)
-  - [Events](#events)
-- [Authors](#authors)
-- [Show your support](#show-your-support)
+-   [Table of Contents](#table-of-contents)
+-   [Install](#install)
+-   [Example](#example)
+-   [API](#api)
+    -   [Properties](#properties)
+        -   [bot.autoEat.enabled](#botautoeatenabled)
+        -   [bot.autoEat.isEating](#botautoeatiseating)
+        -   [bot.autoEat.opts](#botautoeatopts)
+        -   [bot.autoEat.foods](#botautoeatfoods)
+        -   [bot.autoEat.foodsArray](#botautoeatfoodsarray)
+        -   [bot.autoEat.foodsByName](#botautoeatfoodsbyname)
+    -   [Methods](#methods)
+        -   [bot.autoEat.setOpts(opts: Partial\<IEatUtilOpts\>)](#botautoeatsetoptsopts-partialieatutilopts)
+        -   [bot.autoEat.eat(opts: EatOptions)](#botautoeateatopts-eatoptions)
+        -   [bot.autoEat.enableAuto()](#botautoeatenableauto)
+        -   [bot.autoEat.disableAuto()](#botautoeatdisableauto)
+        -   [bot.autoEat.cancelEat()](#botautoeatcanceleat)
+    -   [Settings](#settings)
+        -   [IEatUtilOpts](#ieatutilopts)
+        -   [EatOpts](#eatopts)
+    -   [Events](#events)
+-   [Authors](#authors)
+-   [Show your support](#show-your-support)
 
 ## Install
 
@@ -52,7 +48,7 @@ const bot = createBot({
     host: process.argv[2] || 'localhost',
     port: process.argv[3] || 25565,
     username: process.argv[4] || 'bot',
-    auth: process.argv[5] || 'microsoft',
+    auth: process.argv[5] || 'microsoft'
 })
 
 bot.once('spawn', async () => {
@@ -72,6 +68,7 @@ bot.once('spawn', async () => {
     })
 })
 ```
+
 Run this with `node <file>.js [host] [port] [username] [auth]`.
 
 ## API
@@ -123,9 +120,9 @@ Allows you to modify the configuration options for the auto-eat utility dynamica
 
 ```js
 bot.autoEat.setOpts({
-  minHunger: 10,
-  priority: "saturation"
-});
+    minHunger: 10,
+    priority: 'saturation'
+})
 ```
 
 #### bot.autoEat.eat(opts: EatOptions)
@@ -133,16 +130,19 @@ bot.autoEat.setOpts({
 Manually triggers the eating function. If options are not provided, it will automatically pick the best food based on the current options.
 
 ```js
-bot.autoEat.eat({
-    food: 'apple', // optional
-    offhand: true, // optional
-    equipOldItem: false, // optional
-    priority: 'saturation' // optional
-}).then(() => {
-    console.log('Successfully ate the food!');
-}).catch((err) => {
-    console.error('Failed to eat:', err);
-});
+bot.autoEat
+    .eat({
+        food: 'apple', // optional
+        offhand: true, // optional
+        equipOldItem: false, // optional
+        priority: 'saturation' // optional
+    })
+    .then(() => {
+        console.log('Successfully ate the food!')
+    })
+    .catch((err) => {
+        console.error('Failed to eat:', err)
+    })
 ```
 
 #### bot.autoEat.enableAuto()
@@ -150,7 +150,7 @@ bot.autoEat.eat({
 Enables automatic eating based on the bot's hunger and health levels. The bot will automatically check if it needs to eat during each `physicsTick`.
 
 ```js
-bot.autoEat.enableAuto();
+bot.autoEat.enableAuto()
 ```
 
 #### bot.autoEat.disableAuto()
@@ -158,7 +158,7 @@ bot.autoEat.enableAuto();
 Disables the automatic eating functionality.
 
 ```js
-bot.autoEat.disableAuto();
+bot.autoEat.disableAuto()
 ```
 
 #### bot.autoEat.cancelEat()
@@ -166,7 +166,7 @@ bot.autoEat.disableAuto();
 Cancels the current eating action if the bot is in the process of eating.
 
 ```js
-bot.autoEat.cancelEat();
+bot.autoEat.cancelEat()
 ```
 
 ### Settings
@@ -175,65 +175,62 @@ bot.autoEat.cancelEat();
 
 These options define how the `EatUtil` behaves:
 
-- **priority** (`FoodPriority`): Defines the priority for choosing food. Acceptable values are `"foodPoints"`, `"saturation"`, `"effectiveQuality"`, and `"saturationRatio"`. Default is `"foodPoints"`.
-- **minHunger** (`number`): If the bot's hunger is less than or equal to this value, the bot will attempt to eat. Default is `15`.
-- **minHealth** (`number`): If the bot's health is less than or equal to this value, the bot will prioritize eating food with higher saturation. Default is `14`.
-- **bannedFood** (`string[]`): An array of food names that the bot is not allowed to eat. Default includes `"rotten_flesh"`, `"pufferfish"`, `"chorus_fruit"`, `"poisonous_potato"`, `"spider_eye"`.
-- **returnToLastItem** (`boolean`): If `true`, the bot will re-equip the previous item after eating. Default is `true`.
-- **offhand** (`boolean`): If `true`, the bot will use the offhand to eat. Default is `false`.
-- **eatingTimeout** (`number`): The timeout (in milliseconds) for completing the eating action. Default is `3000`.
-- **strictErrors** (`boolean`): If `true`, errors during the eating process will be thrown. Otherwise, they will be logged to the console. Default is `true`.
-
+-   **priority** (`FoodPriority`): Defines the priority for choosing food. Acceptable values are `"foodPoints"`, `"saturation"`, `"effectiveQuality"`, and `"saturationRatio"`. Default is `"foodPoints"`.
+-   **minHunger** (`number`): If the bot's hunger is less than or equal to this value, the bot will attempt to eat. Default is `15`.
+-   **minHealth** (`number`): If the bot's health is less than or equal to this value, the bot will prioritize eating food with higher saturation. Default is `14`.
+-   **bannedFood** (`string[]`): An array of food names that the bot is not allowed to eat. Default includes `"rotten_flesh"`, `"pufferfish"`, `"chorus_fruit"`, `"poisonous_potato"`, `"spider_eye"`.
+-   **returnToLastItem** (`boolean`): If `true`, the bot will re-equip the previous item after eating. Default is `true`.
+-   **offhand** (`boolean`): If `true`, the bot will use the offhand to eat. Default is `false`.
+-   **eatingTimeout** (`number`): The timeout (in milliseconds) for completing the eating action. Default is `3000`.
+-   **strictErrors** (`boolean`): If `true`, errors during the eating process will be thrown. Otherwise, they will be logged to the console. Default is `true`.
 
 #### EatOpts
 
 These options are provided to the `eat` method to override default behavior.:
 
-- **food** (`FoodSelection`): The food item to eat. If not provided, the bot will automatically choose the best food based on the current options.
-- **offhand** (`boolean`): If `true`, the bot will use the offhand to eat. Default is `false`.
-- **equipOldItem** (`boolean`): If `true`, the bot will re-equip the previous item after eating. Default is `true`.
-- **priority** (`FoodPriority`): Defines the priority for choosing food. Acceptable values are `"foodPoints"`, `"saturation"`, `"effectiveQuality"`, and `"saturationRatio"`. Default is `"foodPoints"`.
-
-
-
-
+-   **food** (`FoodSelection`): The food item to eat. If not provided, the bot will automatically choose the best food based on the current options.
+-   **offhand** (`boolean`): If `true`, the bot will use the offhand to eat. Default is `false`.
+-   **equipOldItem** (`boolean`): If `true`, the bot will re-equip the previous item after eating. Default is `true`.
+-   **priority** (`FoodPriority`): Defines the priority for choosing food. Acceptable values are `"foodPoints"`, `"saturation"`, `"effectiveQuality"`, and `"saturationRatio"`. Default is `"foodPoints"`.
 
 ### Events
 
-- **eatStart**: Emitted when the bot starts eating an item.
+-   **eatStart**: Emitted when the bot starts eating an item.
 
 ```js
 bot.autoEat.on('eatStart', (opts) => {
-  console.log(`Started eating ${opts.food.name}`);
-});
+    console.log(`Started eating ${opts.food.name}`)
+})
 ```
 
-- **eatFinish**: Emitted when the bot finishes eating.
+-   **eatFinish**: Emitted when the bot finishes eating.
 
 ```js
 bot.autoEat.on('eatFinish', (opts) => {
-  console.log(`Finished eating ${opts.food.name}`);
-});
+    console.log(`Finished eating ${opts.food.name}`)
+})
 ```
 
-- **eatFail**: Emitted when the bot fails to eat due to an error.
+-   **eatFail**: Emitted when the bot fails to eat due to an error.
 
 ```js
 bot.autoEat.on('eatFail', (error) => {
-  console.error('Eating failed:', error);
-});
+    console.error('Eating failed:', error)
+})
 ```
 
 ## Authors
 
 👤 **Rocco A**
+
 -   Github: https://github.com/GenerelSchwerz
 
 👤 **Link**
+
 -   Github: https://github.com/link-discord
 -   Twitter: https://twitter.com/link0069
 -   Website: https://linkdiscord.xyz/
--   Discord: @link0069 
+-   Discord: @link0069
 
 ## Show your support
 
