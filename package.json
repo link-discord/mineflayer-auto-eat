@@ -5,24 +5,11 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "type": "module",
+    "license": "MIT",
     "scripts": {
         "build": "tsc",
         "prepare": "npm run build",
         "test": "node ./test/index.js"
-    },
-    "keywords": [
-        "mineflayer",
-        "plugin",
-        "minecraft",
-        "autoeat",
-        "auto",
-        "eat"
-    ],
-    "author": "link0069",
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/link-discord/mineflayer-auto-eat"
     },
     "dependencies": {
         "mineflayer": "^4.20.1",
@@ -32,5 +19,27 @@
     "devDependencies": {
         "prismarine-item": "^1.14.0",
         "typescript": "^5.4.5"
-    }
+    },
+    "author": {
+        "name": "Link",
+        "url": "https://github.com/link-discord/"
+    },
+    "contributors": [
+        {
+            "name": "Gen",
+            "url": "https://github.com/GenerelSchwerz"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/link-discord/mineflayer-auto-eat"
+    },
+    "keywords": [
+        "mineflayer",
+        "plugin",
+        "minecraft",
+        "autoeat",
+        "auto",
+        "eat"
+    ]
 }
