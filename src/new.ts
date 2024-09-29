@@ -204,8 +204,10 @@ export class EatUtil extends (EventEmitter as {
         this._eating = true
 
         // Sanitize options; if not valid, throw error.
-        if (!this.sanitizeOpts(opts))
+        if (!this.sanitizeOpts(opts)) {
+            this._eating = false
             throw new Error("No food specified and couldn't find a choice in inventory!")
+        }
 
         // get current item in hand + wanted hand
         const currentItem = this.bot.util.inv.getHandWithItem(opts.offhand)
