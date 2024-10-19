@@ -9,6 +9,26 @@ declare module 'mineflayer' {
 }
 
 export function loader(bot: Bot) {
-    if (!bot.hasPlugin(utilPlugin.default)) bot.loadPlugin(utilPlugin.default)
+    if (!bot.hasPlugin(utilPlugin.default)) {
+        /**
+         * Fixed by Github@AkagawaTsurunaki
+         *
+         * [Issue](https://github.com/link-discord/mineflayer-auto-eat/issues/80):
+         *      AssertionError [ERR_ASSERTION]: plugin needs to be a function
+         *      occurred when loading this plugin.
+         *
+         * Analysis:
+         *      utilPlugin.default is not a `function` but `undefined`
+         *
+         * Solution:
+         *      load `utilPlugin` if `utilPlugin.default` is `undefined`.
+         *
+         */
+        if (utilPlugin.default) {
+            bot.loadPlugin(utilPlugin.default);
+        } else {
+            bot.loadPlugin(utilPlugin)
+        }
+    }
     bot.autoEat = new EatUtil(bot)
 }
