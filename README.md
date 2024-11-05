@@ -38,6 +38,8 @@
 npm install mineflayer-auto-eat
 ```
 
+> **Warning**: This package is ESM only and does not support CommonJS.
+
 ## Example
 
 ```js
