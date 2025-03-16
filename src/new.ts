@@ -100,7 +100,10 @@ export class EatUtil extends (EventEmitter as {
     public findBestChoices(items: Item[], priority: FoodPriority): Item[] {
         return items
             .filter((i) => i.name in this.foodsByName)
-            .filter((i) => !this.opts.bannedFood.includes(i.name))
+            .filter((i) => {
+                if (i.name === "fish" && i.metadata === 3) return false // 1.8 fix
+                return !this.opts.bannedFood.includes(i.name)
+              })
             .sort((a, b) => this.foodsByName[b.name][priority] - this.foodsByName[a.name][priority])
     }
 
