@@ -1,9 +1,5 @@
 <h1 align="center">mineflayer-auto-eat</h1>
 
-![npm](https://img.shields.io/npm/v/mineflayer-auto-eat)
-![npm bundle size](https://img.shields.io/bundlephobia/min/mineflayer-auto-eat)
-![GitHub](https://img.shields.io/github/license/link-discord/mineflayer-auto-eat?color=red)
-
 > A customizable and flexible auto-eat utility plugin for Mineflayer bots
 
 ## Table of Contents
