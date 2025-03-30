@@ -173,7 +173,7 @@ export class EatUtil extends (EventEmitter as {
                 }
             }
 
-            const itemListener = (oldItem: Item | null, newItem: Item | null) => {
+            const itemListener = (slot: number, oldItem: Item | null, newItem: Item | null) => {
                 if (oldItem?.slot === relevantItem.slot && newItem?.type !== relevantItem.type) {
                     this.bot._client.off('entity_status', eatingListener)
                     this.bot.inventory.off('updateSlot', itemListener)

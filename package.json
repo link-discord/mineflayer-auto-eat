@@ -12,8 +12,8 @@
         "test": "node ./test/index.js"
     },
     "dependencies": {
+        "@nxg-org/mineflayer-util-plugin": "^1.8.4",
         "mineflayer": "^4.20.1",
-        "@nxg-org/mineflayer-util-plugin": "^1.8.0",
         "strict-event-emitter-types": "^2.0.0"
     },
     "devDependencies": {
