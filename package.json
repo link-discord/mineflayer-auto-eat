@@ -32,7 +32,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/link-discord/mineflayer-auto-eat"
+        "url": "git+https://github.com/link-discord/mineflayer-auto-eat.git"
     },
     "keywords": [
         "mineflayer",
